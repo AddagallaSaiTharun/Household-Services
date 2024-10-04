@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+bcrypt
+redis
+celery[redis]
+flask-sse
+gunicorm
+gevent
+Flask-Caching
+email_validator
