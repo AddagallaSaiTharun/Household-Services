@@ -1,29 +1,11 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-import os
 import uuid
-
 from datetime import datetime
 from sqlalchemy import func
-from dotenv import load_dotenv
-from pathlib import Path
+from application.database import db
 
-env_path = Path('.env')
-
-load_dotenv(dotenv_path=env_path)
-
-cur_dir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(cur_dir, "fixupcrew.db")
-db = SQLAlchemy()
-db.init_app(app)
-app.app_context().push()
-
-
-class User(db.Model):
-    __tablename__ = "users"
-    user_id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
+class Customers(db.Model):
+    __tablename__ = "customers"
+    customer_id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     user_name = db.Column(db.String(50),nullable=False)
     email = db.Column(db.String(50),nullable=False,unique=True)
     password = db.Column(db.String(50),nullable=False)
@@ -37,7 +19,7 @@ class User(db.Model):
 class Professional(db.Model):
     __tablename__ = "professional"
     id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
-    professional_id = db.Column(db.String,db.ForeignKey('users.user_id'))
+    professional_id = db.Column(db.String,db.ForeignKey('customers.customer_id'))
     service_id = db.Column(db.String(50), db.ForeignKey('services.service_id'), nullable = False)
     Experience = db.Column(db.Integer,nullable=False)
     description = db.Column(db.String(250), nullable = False)
@@ -65,7 +47,7 @@ class Reviews(db.Model):
     __tablename__ = "reviews"
     id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     professional_id = db.Column(db.String, db.ForeignKey('professional.professional_id'))
-    user_id = db.Column(db.String, db.ForeignKey('users.user_id'))
+    customer_id = db.Column(db.String, db.ForeignKey('customers.customer_id'))
     service_request_id = db.Column(db.String, db.ForeignKey('service_history.id'))
     rating = db.Column(db.Float, nullable = False)
     review = db.Column(db.String(250), nullable = False)
@@ -74,11 +56,9 @@ class Service_history(db.Model):
     __tablename__ = "service_history"
     id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     service_id = db.Column(db.String, db.ForeignKey('services.service_id'))
-    user_id = db.Column(db.String, db.ForeignKey('users.sser_id'))
+    user_id = db.Column(db.String, db.ForeignKey('customers.customer_id'))
     professional_id = db.Column(db.String, db.ForeignKey('professional.professional_id'))
     date_of_request = db.Column(db.DateTime, nullable=False,default=datetime.utcnow)
     date_of_completion = db.Column(db.DateTime, nullable=False)
     service_status = db.Column(db.String(50), nullable = False, default="pending")
     remarks = db.Column(db.String(250), nullable = True)
-
-db.create_all()
