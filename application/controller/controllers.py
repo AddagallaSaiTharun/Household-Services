@@ -31,5 +31,6 @@ def google():
 def google_auth():
     token = oauth.google.authorize_access_token()
     user = token.get('userinfo')
+    print(user)
     return redirect('/')
  
