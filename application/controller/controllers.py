@@ -33,4 +33,5 @@ def google_auth():
     user = token.get('userinfo')
     print(user)
     return redirect('/')
- 
+
+
