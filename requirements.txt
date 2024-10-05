@@ -4,7 +4,10 @@ bcrypt
 redis
 celery[redis]
 flask-sse
-gunicorm
+gunicorn
 gevent
 Flask-Caching
 email_validator
+python-dotenv
+PyMySQL
+Flask-Cors
