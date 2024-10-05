@@ -9,5 +9,5 @@ gevent
 Flask-Caching
 email_validator
 python-dotenv
-PyMySQL
 Flask-Cors
+flask_restful
