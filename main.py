@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_restful import Resource, Api
 from application.data.database import db
 from application.config import localConfig
+import os
 
 APP = None
 API = None
@@ -18,6 +19,7 @@ def create_app():
         A tuple containing the Flask app and the Flask-RESTful API instance.
     """
     flask_app = Flask(__name__)
+    flask_app.secret_key = os.getenv('SECRET_KEY')
     flask_app.config.from_object(localConfig)
     db.init_app(flask_app)
     flask_api = Api(flask_app)
@@ -28,7 +30,6 @@ def create_app():
 APP,API = create_app()
 
 from application.controller.controllers import *
-
 
 if __name__ == '__main__':
     APP.run(port=5000,host="0.0.0.0",debug=True)
