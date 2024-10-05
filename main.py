@@ -1,28 +1,34 @@
 from flask import Flask
-from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
-import os
 from flask_cors import CORS
+from flask_restful import Resource, Api
+from application.data.database import db
+from application.config import localConfig
 
-load_dotenv()
+APP = None
+API = None
 
-app = Flask(__name__)
-app.config.from_object(__name__)
-CORS(app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "Access-Control-Allow-Origin"}})
+def create_app():
+    """
+    Creates and configures the Flask application.
 
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    This function initializes the Flask app, loads configuration settings,
+    initializes the database, and creates a Flask-RESTful API instance.
 
+    Returns:
+        A tuple containing the Flask app and the Flask-RESTful API instance.
+    """
+    flask_app = Flask(__name__)
+    flask_app.config.from_object(localConfig)
+    db.init_app(flask_app)
+    flask_api = Api(flask_app)
+    flask_app.app_context().push()
+    CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "Access-Control-Allow-Origin"}})
+    return flask_app, flask_api
 
-cur_dir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(cur_dir, "fixupcrew.db")
-db = SQLAlchemy(app)
+APP,API = create_app()
 
-
-@app.route('/', methods=['GET'])
-def home():
-    return("Hello World")
+from application.controller.controllers import *
 
 
 if __name__ == '__main__':
-    app.run(port=5000, host="localhost", debug=True)
+    APP.run(port=5000,host="0.0.0.0",debug=True)
