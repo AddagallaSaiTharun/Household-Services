@@ -11,3 +11,5 @@ email_validator
 python-dotenv
 PyMySQL
 Flask-Cors
+Authlib 
+requests
