@@ -22,7 +22,7 @@ app.app_context().push()
 
 
 class User(db.Model):
-    tablename = "users"
+    __tablename__ = "users"
     user_id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     user_name = db.Column(db.String(50),nullable=False)
     email = db.Column(db.String(50),nullable=False,unique=True)
@@ -35,8 +35,9 @@ class User(db.Model):
 
 
 class Professional(db.Model):
-    tablename = "professional"
-    professional_id = db.Column(db.String,db.ForeignKey('users.user_id'),primary_key = True)
+    __tablename__ = "professional"
+    id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
+    professional_id = db.Column(db.String,db.ForeignKey('users.user_id'))
     service_id = db.Column(db.String(50), db.ForeignKey('services.service_id'), nullable = False)
     Experience = db.Column(db.Integer,nullable=False)
     description = db.Column(db.String(250), nullable = False)
@@ -46,23 +47,23 @@ class Professional(db.Model):
 
 
 class Services(db.Model):
-    tablename = "services"
-    service_id = db.Column(db.String,primary_key = True)
+    __tablename__ = "services"
+    service_id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     service_name = db.Column(db.String(50),nullable=False)
     timereq = db.Column(db.Float, nullable = False)
     description = db.Column(db.String(250), nullable = False)
 
 class Service_price(db.Model):
-    tablename = "service_price"
-    id = db.Column(db.String,primary_key = True)
+    __tablename__ = "service_price"
+    id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     service_id = db.Column(db.String(50), db.ForeignKey('services.service_id') ,nullable = False)
     location = db.Column(db.String(50), nullable = False)
     experience = db.Column(db.Integer, nullable = False)
     price = db.Column(db.Float, nullable = False)
 
 class Reviews(db.Model):
-    tablename = "reviews"
-    id = db.Column(db.String,primary_key = True)
+    __tablename__ = "reviews"
+    id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
     professional_id = db.Column(db.String, db.ForeignKey('professional.professional_id'))
     user_id = db.Column(db.String, db.ForeignKey('users.user_id'))
     service_request_id = db.Column(db.String, db.ForeignKey('service_history.id'))
@@ -70,10 +71,10 @@ class Reviews(db.Model):
     review = db.Column(db.String(250), nullable = False)
 
 class Service_history(db.Model):
-    tablename = "service_history"
-    id = db.Column(db.String,primary_key = True)
-    service_id = db.column(db.String, db.ForeignKey('services.service_id'))
-    user_id = db.column(db.String, db.ForeignKey('users.sser_id'))
+    __tablename__ = "service_history"
+    id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
+    service_id = db.Column(db.String, db.ForeignKey('services.service_id'))
+    user_id = db.Column(db.String, db.ForeignKey('users.sser_id'))
     professional_id = db.Column(db.String, db.ForeignKey('professional.professional_id'))
     date_of_request = db.Column(db.DateTime, nullable=False,default=datetime.utcnow)
     date_of_completion = db.Column(db.DateTime, nullable=False)
