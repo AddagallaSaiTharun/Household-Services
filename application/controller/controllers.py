@@ -32,7 +32,5 @@ def google_auth():
     token = oauth.google.authorize_access_token()
     user = token.get('userinfo')
     return redirect('/')
-@app.route('/', methods=['GET'])
-def home():
-    return("Hello World")
+
 
