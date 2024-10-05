@@ -15,6 +15,7 @@ class Customers(db.Model):
     professional_id = db.Column(db.String(50),nullable=True)
     role = db.Column(db.String(20), default ="user")
 
+
 class Professional(db.Model):
     __tablename__ = "professional"
     id = db.Column(db.String,primary_key = True, default=lambda: str(uuid.uuid4()))
