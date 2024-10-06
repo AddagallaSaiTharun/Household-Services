@@ -1,20 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Authlib Connect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
 </head>
 <body>
-	<p align="center">
-		<a href="google/">
-		<img id="google"
-			src="https://img.shields.io/badge/Google-Connect-brightgreen?style=for-the-badge&labelColor=black&logo=google"
-			alt="Google"> <br>
-		</a>
-	</p>
-
-
-
+    <h2>Welcome, {{ username }}!</h2>
+    <p>You are successfully logged in.</p>
+    
+    <ul>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign up another user</a></li>
+    </ul>
 </body>
 </html>
