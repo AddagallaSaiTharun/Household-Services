@@ -11,3 +11,5 @@ email_validator
 python-dotenv
 Flask-Cors
 flask_restful
+Authlib 
+requests
