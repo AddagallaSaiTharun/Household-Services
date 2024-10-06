@@ -3,3 +3,7 @@ from flask import current_app as app
 
 celery = Celery("Application Jobs")
 
+class ContextTask(celery.Task):
+    def __cal__(self,*args,**kwargs):
+        with app.app_context():
+            return self.run(*args,**kwargs)
