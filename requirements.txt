@@ -13,3 +13,4 @@ Flask-Cors
 flask_restful
 Authlib 
 requests
+flask-bcrypt 

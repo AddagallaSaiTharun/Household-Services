@@ -25,6 +25,8 @@ def create_app():
     db.init_app(flask_app)
     flask_api = Api(flask_app)
     flask_app.app_context().push()
+    from application.data.models import ServiceRequests,Services,Professionals,Users
+    db.create_all()
     CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "Access-Control-Allow-Origin"}})
 
     # flask_celery = workers.celery
