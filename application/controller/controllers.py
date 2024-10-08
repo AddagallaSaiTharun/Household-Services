@@ -1,22 +1,43 @@
 from flask import current_app as app
-from flask import render_template, url_for, redirect, session, flash, request
+from flask import render_template, url_for, redirect, session, flash, request, jsonify
 from authlib.integrations.flask_client import OAuth
 from application.config import oAuth_cred
 from application.data.models import Users
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 from application.data.database import db
-
+import jwt
+from functools import wraps
 
 oauth  = OAuth(app)
 bcrypt = Bcrypt(app)
-app.permanent_session_lifetime = timedelta(minutes=30)
+
+
+def token_required(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        token = request.args.get('token')
+        
+        if not token: 
+            return redirect(url_for('index'))
+        try:
+            # Attempt to decode the token using the secret key
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'Alert!': 'Token has expired!'}), 403
+        except jwt.InvalidTokenError:
+            return jsonify({'Alert!': 'Invalid Token!'}), 403
+        
+        return func(*args, **kwargs)  
+
+    return decorated
+
+
+
 
 @app.route('/')
 def index():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('index.html', username = session['username'])
+    return render_template('/index.html')
 
 @app.route('/google/')
 def google():
@@ -39,20 +60,31 @@ def google():
 def google_auth():
     token = oauth.google.authorize_access_token()
     user = token.get('userinfo')
-    session['username'] = user['name']
-    print(user)
-    return redirect('/')
 
+    session['logged_in'] = True
+    token = jwt.encode({
+                'user_id': "none",
+                'email': user.email,
+                'name' : user.given_name,
+                'address' : "none",
+                'address_link' : "none",
+            },app.config['SECRET_KEY'])
+    
+    return jsonify({
+                'token': token, 
+                'message': 'Login successful',
+                'name' : user.given_name,
+            }), 200
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
     if request.method == 'POST':
         email = request.form['email']
         first_name = request.form['first_name']
-        last_name = request.form.get('last_name')  # Optional field
+        last_name = request.form.get('last_name')
         age = request.form.get('age')
         gender = request.form.get('gender')
-        user_image_url = request.form.get('user_image_url')  # Optional field
+        user_image_url = request.form.get('user_image_url') 
         password = request.form['password']
         confirm_password = request.form['confirm_password']
         phone = request.form['phone']
@@ -60,18 +92,14 @@ def signup():
         address_link = request.form['address_link']
         pincode = request.form['pincode']
 
-        # Validation: Check if username or phone already exists
         if Users.query.filter_by(email=email).first():
-            flash('Usersname already exists. Please choose another.', 'danger')
+            return jsonify({'message': 'Email already exists'}), 400
         elif Users.query.filter_by(phone=phone).first():
-            flash('Phone number already exists. Please choose another.', 'danger')
+            return jsonify({'message': 'Phone number already exists'}), 400
         elif password != confirm_password:
-            flash('Passwords do not match. Please try again.', 'danger')
+            return jsonify({'message': 'Passwords do not match'}), 400
         else:
-            # Hash the password before storing it
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-            
-            # Create a new user instance
+            hashed_password = hashed_password = bcrypt.generate_password_hash(password)
             new_user = Users(
                 email=email,
                 first_name=first_name,
@@ -88,10 +116,9 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             
-            flash('Signup successful! Please login.', 'success')
-            return redirect(url_for('login'))
-    return render_template('signup.html')
+            return jsonify({'message': 'signup successful'}), 200
 
+   
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -100,15 +127,32 @@ def login():
         user = Users.query.filter_by(email = email).first()
         if user and bcrypt.check_password_hash(user.password, password):
             session.permanent = True  
-            session['username'] = user.first_name+user.last_name
-            flash('Login successful!', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Invalid credentials. Please try again.', 'danger')
-    return render_template('login.html')
+            session['logged_in'] = True
 
-@app.route('/logout')
+            token = jwt.encode({
+                'user_id': user.user_id,
+                'email': user.email,
+                'name' : user.first_name,
+                'address' : user.address,
+                'address_link' : user.address_link,
+            },app.config['SECRET_KEY'])
+
+            return jsonify({
+                'token': token, 
+                'message': 'Login successful',
+                'name' : user.first_name,
+            }), 200
+        else:
+            return jsonify({'message': 'Invalid credentials'}), 401
+
+@app.route('/logout', methods=['GET'])
 def logout():
-    session.pop('username', None) 
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('login'))
+    session.clear()
+    return jsonify({'message': 'Logged out'}), 200
+
+
+
+@app.route('/protected')
+@token_required
+def protected():
+    return jsonify({'message': 'This is a protected route. Token is valid!'}), 200

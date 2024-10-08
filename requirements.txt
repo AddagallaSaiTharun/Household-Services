@@ -14,3 +14,4 @@ flask_restful
 Authlib 
 requests
 flask-bcrypt 
+PyJWT
