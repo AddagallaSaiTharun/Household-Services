@@ -137,35 +137,37 @@ class UserAPI(Resource):
         """
         Creates a new user.
         """
-        user_id, role, email, error = preprocesjwt(request)
+        user_id, role, _, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
 
         data = request.get_json()
 
         if data['role'] == "user":
-            required_fields = ["email", "first_name", "last_name", "age", "gender", "role", "user_image_url", "password", "phone", "address", "address_link", "pincode"]
+            required_fields = ["email", "first_name", "password", "phone", "address", "pincode"]
             if not all(field in data for field in required_fields):
                 missing_fields = [field for field in required_fields if field not in data]
                 return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
+            if Users.query.filter_by(email=data["email"]).first():
+                return json.dumps({"error": "User with this email already exists"}), 400
             hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
             user = Users(
                 email=data['email'],
                 first_name=data['first_name'],
-                last_name=data['last_name'],
-                age=data['age'],
-                gender=data['gender'],
-                role=data['role'],
-                user_image_url=data['user_image_url'],
+                last_name=data.get('last_name'),
+                age=data.get('age'),
+                gender=data.get('gender'),
+                role = data['role'],
+                user_image_url=data.get('user_image_url'),
                 password=hashed_password,
                 phone=data['phone'],
                 address=data['address'],
-                address_link=data['address_link'],
+                address_link=data.get('address_link'),
                 pincode=data['pincode']
             )
             db.session.add(user)
             db.session.commit()
-            return json.dumps({"message": "User created successfully", "email": user.email}), 201
+            return json.dumps({"message": "success", "email": user.email}), 201
 
         elif role == "user":
             required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
@@ -182,7 +184,5 @@ class UserAPI(Resource):
             )
             db.session.add(prof)
             db.session.commit()
-            return json.dumps({"message": "Professional created successfully", 
-                               "prof_userid": prof.prof_userid}), 201
-
+            return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid}), 201
         return json.dumps({'error': 'Unauthorized access'}), 401      

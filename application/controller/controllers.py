@@ -42,6 +42,7 @@ def google_auth():
                 'name' : user.given_name,
                 'address' : "none",
                 'address_link' : "none",
+                'role' : 'user'
             },app.config['SECRET_KEY'])
     
     return json.dumps({

@@ -49,13 +49,13 @@ from application.api.users import UserAPI
 from application.api.services import ServiceAPI
 from application.api.srvcreq import ServiceRequestAPI
 from application.api.login import UserLogin
-from application.api.register import UserRegister
+# from application.api.register import UserRegister
 
 API.add_resource(UserAPI,"/api/user")
 API.add_resource(ServiceAPI,"/api/service")
 API.add_resource(ServiceRequestAPI,"/api/srvcreq")
 API.add_resource(UserLogin,"/api/login")   
-API.add_resource(UserRegister,"/api/register")
+# API.add_resource(UserRegister,"/api/register")
 
 if __name__ == '__main__':
     APP.run(port=5000,host="0.0.0.0",debug=True)

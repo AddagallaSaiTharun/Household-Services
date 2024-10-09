@@ -41,8 +41,8 @@ const Home = Vue.component("home-component", {
 
     try {
       const response = await axios.get('/api/services', {
-        params: {
-          token: this.token
+        headers: {
+          Authorization: 'Bearer ' + token
         }
       });
 

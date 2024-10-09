@@ -89,7 +89,7 @@ const Signup = Vue.component("SignupComponent", {
   methods: {
     async submitSignup() {
       try {
-        const response = await axios.post('/api/register', {
+        const response = await axios.post('/api/user', {
           email: this.email,
           first_name: this.first_name,
           last_name: this.last_name,
@@ -101,7 +101,11 @@ const Signup = Vue.component("SignupComponent", {
           phone: this.phone,
           address: this.address,
           address_link: this.address_link,
-          pincode: this.pincode
+          pincode: this.pincode,
+          role:"user",
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
        
 
