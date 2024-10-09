@@ -4,7 +4,7 @@ from application.data.database import db
 
 class Services(db.Model): #One (One : Service , Many : Professionals)  
     __tablename__ = "services"
-    service_id = db.Column(db.String, primary_key=True)
+    service_id = db.Column(db.String, primary_key=True,default = lambda: str(uuid.uuid4()))
     service_name = db.Column(db.String(50), nullable=False,unique=True)
     time_req = db.Column(db.Integer,server_default = db.text('0'),nullable=False)
     service_image=db.Column(db.BLOB) #profile Image
@@ -41,6 +41,7 @@ class Users(db.Model):  #One
     address = db.Column(db.String,nullable=True)
     address_link = db.Column(db.String,nullable=True) #For Distance Matrix API from GMaps to measure distance for price calculation
     pincode = db.Column(db.Integer,nullable=True)
+    srvc_reqs = db.relationship('ServiceRequests',backref="usr",lazy=True)
 
 
 class ServiceRequests(db.Model):  #Many
