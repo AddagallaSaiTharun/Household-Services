@@ -4,6 +4,9 @@ from application.utils.validation import preprocesjwt
 from application.data.database import db
 from application.data.models import Users, Professionals
 import json
+from flask_bcrypt import Bcrypt
+from flask import current_app as app
+bcrypt = Bcrypt(app)
 
 class UserAPI(Resource):
     def get(self):
@@ -134,7 +137,7 @@ class UserAPI(Resource):
         """
         Creates a new user.
         """
-        user_id, _, role, error = preprocesjwt(request)
+        user_id, role, email, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
 
@@ -145,7 +148,7 @@ class UserAPI(Resource):
             if not all(field in data for field in required_fields):
                 missing_fields = [field for field in required_fields if field not in data]
                 return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-
+            hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
             user = Users(
                 email=data['email'],
                 first_name=data['first_name'],
@@ -154,7 +157,7 @@ class UserAPI(Resource):
                 gender=data['gender'],
                 role=data['role'],
                 user_image_url=data['user_image_url'],
-                password=data['password'],
+                password=hashed_password,
                 phone=data['phone'],
                 address=data['address'],
                 address_link=data['address_link'],

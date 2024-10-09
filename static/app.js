@@ -1,6 +1,8 @@
 import Home from "./home.js";
 import Login from "./login.js";
 import Signup from "./signup.js";
+import navbar from "./navbar.js";
+
 
 
 const routes = [

@@ -1,67 +1,56 @@
 const Home = Vue.component("home-component", {
   template: `
-    <div>
-      <h2>Welcome, {{ username }}!</h2>
-      <p>You are successfully logged in.</p>
-      <ul>
-        <li><a @click="logout" href="#">Logout</a></li>
-        <li><a href="/signup">Sign up another user</a></li>
-      </ul>
-      <div id="response"></div>
+    <div style="display: flex;">
+      <div class="left" style="width: 60%;">asdasd</div>
+      
+      <div class="right" style="width: 40%;">
+        <center>
+          <h2>What are you looking for?</h2>
+        </center>
+
+        <div class="grid-container" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; gap: 10px;">
+          <div v-for="service in services" :key="service.id" class="grid-item" style="height: 2in; margin: 3px;background-color: aqua;">
+            <center>{{ service.name }}</center>
+          </div>              
+        </div>
+      </div>
     </div>
   `,
   data() {
     return {
-      username: localStorage.getItem("user"),  // Get username from localStorage
-      token: localStorage.getItem("token"),    // Get token from localStorage
+      username: localStorage.getItem("user"),
+      token: localStorage.getItem("token"),
+      // services: []
+      services: [
+        { name: "Web Development" },
+        { name: "Graphic Design" },
+        { name: "SEO Optimization" },
+        { name: "Content Writing" },
+        { name: "Digital Marketing" },
+        { name: "Mobile App Development" },
+        { name: "Cloud Services" },
+        { name: "UI/UX Design" }
+      ]
+      // demo data
     };
   },
-  created() {
-    // Use 'this.token' from the data object
+  async created() {
     if (!this.token) {
-      window.location.href = "/#/login";  // Redirect to login if no token found
-    } else {
-      // Fetch from the protected route with the token
-      fetch(`/protected?token=${this.token}`, {
-        method: "GET",  // Use GET because the backend expects it
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // Display the response message
-          document.getElementById("response").innerHTML = `<p>${
-            data.message || data.Alert
-          }</p>`;
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          document.getElementById("response").innerHTML = `<p>An error occurred</p>`;
-        });
+      window.location.href = "/#/login";
     }
-  },
-  methods: {
-    logout() {
-      // Remove token and user from localStorage
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
 
-      // Send a GET request to /logout to log out from the server side
-      fetch("/logout", {
-        method: "GET",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.message === "Logged out") {
-            alert("You have been logged out.");
-            window.location.href = "/#/login";  // Redirect to login
-          }
-        })
-        .catch((error) => {
-          console.error("Error during logout:", error);
-        });
-    },
+    try {
+      const response = await axios.get('/api/services', {
+        params: {
+          token: this.token
+        }
+      });
+
+      // Set the fetched data to services
+      this.services = response.data;
+    } catch (error) {
+      console.error('Error fetching service data:', error);
+    }
   },
 });
 

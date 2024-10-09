@@ -14,10 +14,6 @@ class ServiceAPI(Resource):
         Returns services based on the data in the request.
         If no data is provided, returns all services.
         """
-        _, _, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
         query = Services.query
         
         filter_args = {

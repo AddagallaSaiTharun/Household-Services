@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Vue.js CDN -->
@@ -24,31 +28,30 @@
     <!-- Bootstrap 3 Theme CSS -->
     <link
       rel="stylesheet"
-
-
-
-
       href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
       integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
       crossorigin="anonymous"
     />
 
+    <!-- Axios CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.js"></script>
+
     <title>Home</title>
   </head>
   <body>
-    <div class="container" id="app">
-      <router-link to="/">Home</router-link>
-      <router-link to="/login">Login</router-link>
-      <router-link to="/signup">Signup</router-link>
+    <div id="app" style="padding: 10px;">
+      
 
+      <navbar></navbar>
+      
 
-      <div class="row">
+      <div>
         <router-view></router-view>
       </div>
     </div>
   </body>
-  <script type="module" src="{{ url_for('static', filename='app.js') }}">
-
-    
-  </script> 
+  <script
+    type="module"
+    src="{{ url_for('static', filename='app.js') }}"
+  ></script>
 </html>
