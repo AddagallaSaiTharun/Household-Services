@@ -1,3 +1,5 @@
+
+
 const Signup = Vue.component("SignupComponent", {
   template: `
     <div>
@@ -68,7 +70,7 @@ const Signup = Vue.component("SignupComponent", {
       <a href="/login">Already have an account? Login here</a>
     </div>
   `,
-  data: function () {
+  data() {
     return {
       email: '',
       first_name: '',
@@ -85,45 +87,39 @@ const Signup = Vue.component("SignupComponent", {
     };
   },
   methods: {
-    submitSignup() {
-      // Prepare the form data to be sent via POST request
-      const formData = new URLSearchParams();
-      formData.append('email', this.email);
-      formData.append('first_name', this.first_name);
-      formData.append('last_name', this.last_name);
-      formData.append('age', this.age);
-      formData.append('gender', this.gender);
-      formData.append('user_image_url', this.user_image_url);
-      formData.append('password', this.password);
-      formData.append('confirm_password', this.confirm_password);
-      formData.append('phone', this.phone);
-      formData.append('address', this.address);
-      formData.append('address_link', this.address_link);
-      formData.append('pincode', this.pincode);
+    async submitSignup() {
+      try {
+        const response = await axios.post('/api/register', {
+          email: this.email,
+          first_name: this.first_name,
+          last_name: this.last_name,
+          age: this.age,
+          gender: this.gender,
+          user_image_url: this.user_image_url,
+          password: this.password,
+          confirm_password: this.confirm_password,
+          phone: this.phone,
+          address: this.address,
+          address_link: this.address_link,
+          pincode: this.pincode
+        });
+       
 
-      // Send the POST request
-      fetch('/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message === 'signup successful') {
-          alert('Signup successful!');
-          window.location.href = '/login';
+        const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+
+
+        if (data.message == 'success') {
+    
+          window.location.href = '/#/login';
         } else {
           alert('Signup failed: ' + data.message);
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+      } catch (error) {
+        console.error('Error during signup:', error);
+        alert('An error occurred during signup. Please try again.');
+      }
     }
   }
 });
-
 
 export default Signup;

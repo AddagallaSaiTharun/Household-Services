@@ -39,36 +39,30 @@ const Login = Vue.component("LoginComponent", {
     };
   },
   methods: {
-    login() {
+    async login() {
       var email = document.getElementById("email").value;
       var password = document.getElementById("password").value;
-      console.log(email, password);
-      fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
+      try {
+        const response = await axios.post("/api/login", {
           email: email,
           password: password,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.token) {
-            console.log(data);
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", data.name);
-            alert("Login successful!");
-            window.location.href = "/";
-          } else {
-            alert("Login failed: " + data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
         });
+
+        const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", data.name);
+
+
+          window.location.href = "/";
+        } else {
+          // If login fails, display the error message
+          alert("Login failed: " + data.message);
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        alert("An error occurred. Please try again.");
+      }
     },
   },
 });

@@ -1,8 +1,11 @@
-# from jwt import jwt
+import jwt
+import json
+from flask import current_app as app
+
 def preprocesjwt(request):
-    # auth_header = request.headers.get('Authorization')
-    # if auth_header.startswith('Bearer '):
-    #     token = auth_header.split(' ')[1]  # Get the token part
-    #   return user_id,role,user_name,False
-    return "60e80f33-2b9d-4e24-aaeb-4ef5eb8fa507","professional","asdhbsa",False
-    # return None,None,None,True
+    token = request.args.get('token')
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return payload.get('user_id'), payload.get('role'), payload.get('email'), False
+    except :
+        return None,None,None,True
