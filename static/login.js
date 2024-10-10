@@ -52,11 +52,8 @@ const Login = Vue.component("LoginComponent", {
         if (data.token) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", data.name);
-
-
           window.location.href = "/";
         } else {
-          // If login fails, display the error message
           alert("Login failed: " + data.message);
         }
       } catch (error) {

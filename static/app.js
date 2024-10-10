@@ -2,13 +2,14 @@ import Home from "./home.js";
 import Login from "./login.js";
 import Signup from "./signup.js";
 import navbar from "./navbar.js";
-
-
+import admin_home from "./admin_home.js";
+import add_service from "./add_service.js";
 
 const routes = [
   { path: "/", component: Home },
   { path: "/login", component: Login },
   { path: "/signup", component: Signup },
+  { path: "/add_service", component: add_service },
 ];
 
 

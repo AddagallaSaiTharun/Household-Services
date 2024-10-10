@@ -34,6 +34,7 @@ class UserLogin(Resource):
                 'token': token, 
                 'message': 'Login successful',
                 'name': user.first_name,
+                'role':user.role
             }), 200
         else:
             return json.dumps({'message': 'Invalid credentials'}), 401

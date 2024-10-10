@@ -4,6 +4,10 @@ from flask import request
 from application.utils.validation import preprocesjwt
 from application.data.database import db
 from application.data.models import Services
+from PIL import Image
+from io import BytesIO
+import base64
+
 
 class ServiceAPI(Resource):
     """
@@ -26,19 +30,23 @@ class ServiceAPI(Resource):
             query = query.filter_by(**filter_args)
 
         services = query.all()
+        result = []
+        for service in services:
+            # Decode the base64 image
+            decoded_image = base64.b64decode(service.service_image)
 
-        return json.dumps({
-            "message": [
-                {
-                    'service_id': service.service_id,
-                    'service_name': service.service_name,
-                    'time_req': service.time_req,
-                    'service_base_price': service.service_base_price,
-                    'service_image': service.service_image,
-                    'service_dscp': service.service_dscp
-                } for service in services
-            ]
-        })
+            # Create response content
+            result.append({
+                'service_id': service.service_id,
+                'service_name': service.service_name,
+                'time_req': service.time_req,
+                'service_base_price': service.service_base_price,
+                # Send image as a base64 string (re-encode after decoding)
+                'service_image': base64.b64encode(decoded_image).decode('utf-8'),
+                'service_dscp': service.service_dscp
+            })
+        
+        return json.dumps({"content": result})
     
     def put(self):
         """
@@ -91,18 +99,32 @@ class ServiceAPI(Resource):
         if error or role != "admin":
             return json.dumps({'error': 'Unauthorized access'}), 401
 
-        data = request.get_json()
+        file = request.files['service_image']
+        data = request.form
         required_fields = ["service_name", "time_req", "service_base_price", "service_dscp"]
 
         if not all(field in data for field in required_fields):
             missing_fields = [field for field in required_fields if field not in data]
             return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
 
+        image_data = None
+
+        if 'service_image' in request.files:
+            img = Image.open(file)
+
+            compressed = BytesIO()
+
+            img.save(compressed, format = img.format, optimize = True, quality = 10)
+
+            compressed_data = compressed.getvalue()
+
+            image_data = base64.b64encode(compressed_data)
+  
         service = Services(
             service_name=data['service_name'],
             time_req=data['time_req'],
             service_base_price=data['service_base_price'],
-            # service_image=data['service_image'],
+            service_image=image_data,
             service_dscp=data['service_dscp']
         )
 

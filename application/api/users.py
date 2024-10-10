@@ -8,6 +8,26 @@ from flask_bcrypt import Bcrypt
 from flask import current_app as app
 bcrypt = Bcrypt(app)
 
+
+
+class IsAdimn(Resource):
+    def get(self):
+        """
+        Return True if the user is admin, False otherwise.
+        """
+        _, role, _, error = preprocesjwt(request)
+        if error:
+            return json.dumps({'error': 'Unauthorized access'}), 401
+
+        if role == "admin":
+            return True
+        else:
+            return False
+
+
+
+
+
 class UserAPI(Resource):
     def get(self):
         """
@@ -137,10 +157,7 @@ class UserAPI(Resource):
         """
         Creates a new user.
         """
-        user_id, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
+        
         data = request.get_json()
 
         if data['role'] == "user":
@@ -168,8 +185,10 @@ class UserAPI(Resource):
             db.session.add(user)
             db.session.commit()
             return json.dumps({"message": "success", "email": user.email}), 201
-
-        elif role == "user":
+        user_id, role, _, error = preprocesjwt(request)
+        if error:
+            return json.dumps({'error': 'Unauthorized access'}), 401
+        if role == "user":
             required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
             if not all(field in data for field in required_fields):
                 missing_fields = [field for field in required_fields if field not in data]

@@ -107,13 +107,7 @@ const Signup = Vue.component("SignupComponent", {
             'Content-Type': 'application/json'
           }
         });
-       
-
-        const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-
-
-        if (data.message == 'success') {
-    
+        if (response.status == 201) {
           window.location.href = '/#/login';
         } else {
           alert('Signup failed: ' + data.message);
