@@ -1,0 +1,47 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+.login-container {
+    max-width: 700px;
+    margin: 50px auto;
+}
+.login-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-box {
+    padding: 20px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+h2 {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+
+.image-container {
+    border-radius: 10px;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Ensure it takes the height of the container */
+    overflow: hidden; /* To handle any overflow */
+}
+
+.img-fluid {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Ensure the image adjusts to its container while keeping the aspect ratio */
+    border-radius: 10px; /* This keeps the border-radius effect on the image itself */
+}
+
+.btn-primary {
+    background-color: #6a0dad;
+    border-color: #6a0dad;
+}
