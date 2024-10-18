@@ -22,7 +22,7 @@ class ServiceAPI(Resource):
         
         filter_args = {
             column: request.args.get(column)
-            for column in ["service_name", "time_req", "service_base_price", "service_image", "service_dscp"]
+            for column in ["service_id", "service_name", "time_req", "service_base_price", "service_image", "service_dscp"]
             if request.args.get(column) is not None
         }
 
@@ -41,7 +41,6 @@ class ServiceAPI(Resource):
                 'service_name': service.service_name,
                 'time_req': service.time_req,
                 'service_base_price': service.service_base_price,
-                # Send image as a base64 string (re-encode after decoding)
                 'service_image': base64.b64encode(decoded_image).decode('utf-8'),
                 'service_dscp': service.service_dscp
             })

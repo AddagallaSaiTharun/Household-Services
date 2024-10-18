@@ -6,6 +6,8 @@ from application.data.models import Users, Professionals
 import json
 from flask_bcrypt import Bcrypt
 from flask import current_app as app
+from datetime import datetime
+
 bcrypt = Bcrypt(app)
 
 
@@ -160,7 +162,7 @@ class UserAPI(Resource):
         
         data = request.get_json()
 
-        if data['role'] == "user":
+        if "role" in data and data['role'] == "user":
             required_fields = ["email", "first_name", "password", "phone", "address", "pincode"]
             if not all(field in data for field in required_fields):
                 missing_fields = [field for field in required_fields if field not in data]
@@ -193,13 +195,13 @@ class UserAPI(Resource):
             if not all(field in data for field in required_fields):
                 missing_fields = [field for field in required_fields if field not in data]
                 return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-            
+            print(data)
             prof = Professionals(
                 prof_userid=user_id,
                 prof_exp=data['prof_exp'],
                 prof_dscp=data['prof_dscp'],
                 prof_srvcid=data['prof_srvcid'],
-                prof_join_date=data['prof_join_date']
+                prof_join_date=datetime.strptime(data['prof_join_date'], '%Y-%m-%d').date()
             )
             db.session.add(prof)
             db.session.commit()
