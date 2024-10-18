@@ -33,7 +33,10 @@ const Home = Vue.component("home-component", {
               background-color: grey;
               border: none;
               border-radius: 10px;
+              cursor: pointer;
             "
+            @click="open_service(service.service_id)"
+
           >
             <div style="width: 2in; height: 1.3in">
               <img
@@ -55,7 +58,34 @@ const Home = Vue.component("home-component", {
   </div>
   <div v-if="!isAdmin">
     <div style="display: flex">
-      <div class="left" style="width: 60%">asdasd</div>
+      <div class="left" style="width: 60%; padding:80px">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/4.jpg" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/3.jpg" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/2.jpg" class="d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+      </div>
 
       <div class="right" style="width: 40%">
         <center>
@@ -85,7 +115,9 @@ const Home = Vue.component("home-component", {
               background-color: grey;
               border: none;
               border-radius: 10px;
+              cursor: pointer;
             "
+            @click="open_service(service.service_id)"
           >
             <div style="width: 2in; height: 1.3in">
               <img
@@ -97,7 +129,7 @@ const Home = Vue.component("home-component", {
             </div>
             <div style="margin: 5px">
               <center>
-                <h3>service.service_name</h3>
+                <h3>{{ service.service_name }}</h3>
               </center>
             </div>
           </div>
@@ -105,6 +137,7 @@ const Home = Vue.component("home-component", {
       </div>
     </div>
   </div>
+  
 </div>
 
 
@@ -118,6 +151,7 @@ const Home = Vue.component("home-component", {
     };
   },
   async created() {
+    
     for (service in this.services) {
     }
     if (!this.token) {
@@ -144,6 +178,11 @@ const Home = Vue.component("home-component", {
     } catch (error) {
       console.error("Error fetching service data:", error);
     }
+  },
+  methods: {
+    open_service(id) {
+      window.location.href = "/#/service/" + id;
+    },
   },
 });
 

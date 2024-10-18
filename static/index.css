@@ -5,12 +5,20 @@ nav {
   padding: 10px;
   background-color: #e7e7e7;
   color: #000000;
+  border-radius: 20px;
   height: 0.8in;
 }
 
 .navbar-brand {
   font-size: 20px;
   font-weight: bold;
+}
+
+.home_image {
+  border-radius: 30px;
+}
+.image_div {
+  padding: 10px;
 }
 
 .nav-link {
@@ -23,4 +31,31 @@ nav {
 .navbar-text {
   color: #000000;
   padding: 10px;
+}
+
+.navbar-items {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 60px; /* Adjust this based on your navbar height */
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
 }
