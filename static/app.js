@@ -1,11 +1,11 @@
-import Home from "./home.js";
-import Login from "./login.js";
-import Signup from "./signup.js";
-import navbar from "./navbar.js";
-import admin_home from "./admin_home.js";
-import add_service from "./add_service.js";
-import service from "./service.js";
-import register_pro from "./register_pro.js";
+import Home from "./components/home.js";
+import Login from "./components/login.js";
+import Signup from "./components/signup.js";
+import navbar from "./components/navbar.js";
+import admin_home from "./components/admin_home.js";
+import add_service from "./components/add_service.js";
+import service from "./components/service.js";
+import register_pro from "./components/register_pro.js";
 
 
 const routes = [

@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_restful import Resource, Api
+from flask_restful import Api
 from application.data.database import db
 from application.config import localConfig
-from application.jobs import workers
+# from application.jobs import workers
 
 APP = None
 API = None

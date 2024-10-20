@@ -67,13 +67,13 @@ const Home = Vue.component("home-component", {
         </div>
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/4.jpg" class="d-block w-100" alt="...">
+            <img style="height: 5in; border-radius: 30px;" src="/static/images/home_images/4.jpg" class="d-block w-100" alt="...">
           </div>
           <div class="carousel-item">
-            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/3.jpg" class="d-block w-100" alt="...">
+            <img style="height: 5in; border-radius: 30px;" src="/static/images/home_images/3.jpg" class="d-block w-100" alt="...">
           </div>
           <div class="carousel-item">
-            <img style="height: 5in; border-radius: 30px;" src="/static/home_images/2.jpg" class="d-block w-100" alt="...">
+            <img style="height: 5in; border-radius: 30px;" src="/static/images/home_images/2.jpg" class="d-block w-100" alt="...">
           </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
