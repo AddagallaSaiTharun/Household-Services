@@ -49,13 +49,6 @@ class UserAPI(Resource):
             else:
                 return json.dumps({"error": "User not found"}), 404
 
-        elif role == "professional":
-            user = Users.query.filter_by(user_id=user_id).join(Professionals, Users.user_id==Professionals.prof_userid).first()
-            if user:
-                return json.dumps({"message": {"prof_userid": user.usr_professional.prof_userid, "prof_exp": user.usr_professional.prof_exp, "prof_dscp": user.usr_professional.prof_dscp, "prof_srvcid": user.usr_professional.prof_srvcid, "prof_ver": user.usr_professional.prof_ver, "prof_join_date": user.usr_professional.prof_join_date}})
-            else:
-                return json.dumps({"error": "Professional not found"}), 404
-
         elif role == "admin":
             query = Users.query
             data = request.args.to_dict()
@@ -73,7 +66,7 @@ class UserAPI(Resource):
         Updates an existing user based on the user's role.
         """
         user_id, role, _, error = preprocesjwt(request)
-        if error:
+        if error or role=="professional":
             return json.dumps({'error': 'Unauthorized access'}), 401
 
         data = request.get_json()
@@ -88,18 +81,6 @@ class UserAPI(Resource):
                     setattr(user, col, data[col])
             db.session.commit()
             return json.dumps({'message': 'User updated successfully'}), 200
-
-        elif role == "professional":
-            user = Users.query.filter_by(user_id=user_id).join(Professionals, Users.user_id == Professionals.prof_userid).first()
-            if not user:
-                return json.dumps({"error": f"{user_id} not found "}), 400
-            prof_col = ["prof_userid", "prof_exp", "prof_dscp", "prof_srvcid", "prof_ver", "prof_join_date"]
-            for col in prof_col:
-                if col in data:
-                    setattr(user.usr_professional, col, data[col])
-            db.session.commit()
-            return json.dumps({'message': 'Professional updated successfully'}), 200
-
         elif role == "admin":
             if data["role"] == "user":
                 user = Users.query.filter_by(user_id=data["user_id"]).first()
@@ -158,52 +139,29 @@ class UserAPI(Resource):
     def post(self):
         """
         Creates a new user.
-        """
-        
+        """        
         data = request.get_json()
-
-        if "role" in data and data['role'] == "user":
-            required_fields = ["email", "first_name", "password", "phone", "address", "pincode"]
-            if not all(field in data for field in required_fields):
-                missing_fields = [field for field in required_fields if field not in data]
-                return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-            if Users.query.filter_by(email=data["email"]).first():
-                return json.dumps({"error": "User with this email already exists"}), 400
-            hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-            user = Users(
-                email=data['email'],
-                first_name=data['first_name'],
-                last_name=data.get('last_name'),
-                age=data.get('age'),
-                gender=data.get('gender'),
-                role = data['role'],
-                user_image_url=data.get('user_image_url'),
-                password=hashed_password,
-                phone=data['phone'],
-                address=data['address'],
-                address_link=data.get('address_link'),
-                pincode=data['pincode']
-            )
-            db.session.add(user)
-            db.session.commit()
-            return json.dumps({"message": "success", "email": user.email}), 201
-        user_id, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-        if role == "user":
-            required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
-            if not all(field in data for field in required_fields):
-                missing_fields = [field for field in required_fields if field not in data]
-                return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-            print(data)
-            prof = Professionals(
-                prof_userid=user_id,
-                prof_exp=data['prof_exp'],
-                prof_dscp=data['prof_dscp'],
-                prof_srvcid=data['prof_srvcid'],
-                prof_join_date=datetime.strptime(data['prof_join_date'], '%Y-%m-%d').date()
-            )
-            db.session.add(prof)
-            db.session.commit()
-            return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid}), 201
-        return json.dumps({'error': 'Unauthorized access'}), 401      
+        required_fields = ["email", "first_name", "password", "phone", "address", "pincode"]
+        if not all(field in data for field in required_fields):
+            missing_fields = [field for field in required_fields if field not in data]
+            return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
+        if Users.query.filter_by(email=data["email"]).first():
+            return json.dumps({"error": "User with this email already exists"}), 400
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        user = Users(
+            email=data['email'],
+            first_name=data['first_name'],
+            last_name=data.get('last_name'),
+            age=data.get('age'),
+            gender=data.get('gender'),
+            role = "user",
+            user_image_url=data.get('user_image_url'),
+            password=hashed_password,
+            phone=data['phone'],
+            address=data['address'],
+            address_link=data.get('address_link'),
+            pincode=data['pincode']
+        )
+        db.session.add(user)
+        db.session.commit()
+        return json.dumps({"message": "success", "email": user.email}), 201  

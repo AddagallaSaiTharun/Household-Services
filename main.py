@@ -47,13 +47,16 @@ APP,API = create_app()
 from application.controller.controllers import *
 from application.api.users import UserAPI, IsAdimn
 from application.api.services import ServiceAPI
-from application.api.srvcreq import ServiceRequestAPI
+from application.api.srvcreqs import ServiceRequestAPI
 from application.api.login import UserLogin
+from application.api.professional import ProfessionalAPI
+
 
 API.add_resource(UserAPI,"/api/user")
 API.add_resource(ServiceAPI,"/api/service")
 API.add_resource(ServiceRequestAPI,"/api/srvcreq")
 API.add_resource(UserLogin,"/api/login")   
+API.add_resource(ProfessionalAPI,"/api/professional")
 API.add_resource(IsAdimn,"/api/isadmin") 
 
 
