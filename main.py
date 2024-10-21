@@ -45,7 +45,7 @@ APP,API = create_app()
 # APP,API,CELERY = create_app()
 
 from application.controller.controllers import *
-from application.api.users import UserAPI, IsAdimn
+from application.api.users import UserAPI, IsAdimn, IsPro
 from application.api.services import ServiceAPI
 from application.api.srvcreqs import ServiceRequestAPI
 from application.api.login import UserLogin
@@ -58,6 +58,8 @@ API.add_resource(ServiceRequestAPI,"/api/srvcreq")
 API.add_resource(UserLogin,"/api/login")   
 API.add_resource(ProfessionalAPI,"/api/professional")
 API.add_resource(IsAdimn,"/api/isadmin") 
+API.add_resource(IsPro,"/api/ispro") 
+
 
 
 if __name__ == '__main__':

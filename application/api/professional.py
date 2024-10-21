@@ -12,7 +12,7 @@ class ProfessionalAPI(Resource):
         Returns professionals based on the data in the request. 
         If no data is provided, returns all professionals.
         """
-        _, _, _, error = preprocesjwt(request)
+        _, role, _, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
         query = Professionals.query
@@ -21,8 +21,12 @@ class ProfessionalAPI(Resource):
             for column in ["prof_userid", 'prof_exp', 'prof_dscp', 'prof_srvcid', 'prof_ver', 'prof_join_date']:
                 if column in data:
                     query = query.filter(getattr(Professionals, column) == data[column])
-        professionals = query.filter_by(prof_ver=1).all()
-        return json.dumps({"message": [{'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date} for professional in professionals]})
+        if role == "admin":
+            professionals = query.all()
+            return json.dumps({"message": [{'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
+        else:
+            professionals = query.filter_by(prof_ver=1).all()
+            return json.dumps({"message": [{'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
 
     def put(self):
         """
@@ -84,7 +88,7 @@ class ProfessionalAPI(Resource):
         user_id, role, _, error = preprocesjwt(request)
         if error or role!="user":
             return json.dumps({'error': 'Unauthorized access'}), 401
-        data = request.get_json()
+        data = request.form
         if role == "user":
             required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
             if not all(field in data for field in required_fields):

@@ -29,7 +29,10 @@ const navbar = Vue.component("navbar", {
               <a style="text-decoration: none; color: black;" href="#">{{ user }}</a>
               <a style="text-decoration: none; color: black;" href="#">Settings</a>
               <a style="text-decoration: none; color: black;" class="nav-link" href="#" @click="logout">Logout</a>
-              <a v-if="!isAdmin" style="text-decoration: none; color: black;" class="nav-link" @click="regpro">Register as a Pro</a>
+              <div v-if="!isAdmin">
+                <a v-if="!isPro" style="text-decoration: none; color: black;" class="nav-link" @click="regpro">Register as a Pro</a>
+                <a v-if="isPro" style="text-decoration: none; color: black;" class="nav-link"">You are a Pro</a>
+              </div>
             </div>
           </div>
         </div>
@@ -40,14 +43,13 @@ const navbar = Vue.component("navbar", {
       return {
         token: localStorage.getItem("token"),
         isAdmin: false,
+        isPro: false
       }
     },
   computed: {
-    // Check if user is logged in
     isUserLoggedIn() {
       return !!localStorage.getItem("user");
     },
-    // Get the user name from localStorage
     user() {
       return localStorage.getItem("user");
     },
@@ -56,7 +58,6 @@ const navbar = Vue.component("navbar", {
     regpro() {
       window.location.href = "/#/register_pro";
     },
-    // Handle logout by removing user from localStorage
     toggleprofile() {
       const dropdownMenu = document.getElementById("dropdownMenu");
       if (
@@ -87,6 +88,14 @@ const navbar = Vue.component("navbar", {
       },
     });
     this.isAdmin = response.data;
+
+    const pro_data = await axios.get("/api/ispro",{
+      headers: {
+        Authorization: "Bearer " + this.token,
+      }   
+    })
+    this.isPro = pro_data.data;
+    
   },
 });
 

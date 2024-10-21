@@ -69,7 +69,7 @@ const add_service = Vue.component("add-service", {
                 const response = await axios.post('/api/service', formData, {
                     headers: {
                         Authorization: `Bearer ${this.token}`,
-                        'Content-Type': 'multipart/form-data'  // Ensure multipart/form-data is used
+                        'Content-Type': 'multipart/form-data' 
                     }
                 });
 
