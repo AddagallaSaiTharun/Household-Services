@@ -62,25 +62,33 @@ const register_pro = Vue.component("register_pro", {
   },
   methods: {
     async registerPro() {
+      const formData = new FormData();
+
+      formData.append("prof_exp", this.exp);
+      formData.append("prof_dscp", this.desc);
+      formData.append("prof_srvcid", this.service_id);
+      formData.append("prof_join_date", new Date().toISOString().split("T")[0]);
+
+
+
       try {
         const response = await axios.post(
-          "/api/user",
-          {
-            prof_exp: this.exp,
-            prof_dscp: this.desc,  // Ensure this matches the backend
-            prof_srvcid: this.service_id,  // Ensure this matches the backend
-            prof_join_date: new Date().toISOString().split('T')[0] // Format the date correctly
-          },
+          "/api/professional", formData,
           {
             headers: {
               Authorization: "Bearer " + this.token,
+              'Content-Type': 'multipart/form-data' 
             },
           }
-        );
+        )
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         window.location.href = "/";
-
       } catch (error) {
-        console.error("Error registering:", error.response ? error.response.data : error.message);
+        console.error(
+          "Error registering:",
+          error.response ? error.response.data : error.message
+        );
       }
     },
   },
