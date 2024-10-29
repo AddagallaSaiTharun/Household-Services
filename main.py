@@ -3,9 +3,7 @@ from flask_cors import CORS
 from flask_restful import Resource, Api
 from application.data.database import db
 from application.jobs import workers
-# from application.data import models
 from application.config import localConfig
-import os
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -23,24 +21,19 @@ bcrypt = None
 
 
 def create_app():
-    """
-    Creates and configures the Flask application.
-
-    This function initializes the Flask app, loads configuration settings,
-    initializes the database, and creates a Flask-RESTful API instance.
-
-    Returns:
-        A tuple containing the Flask app and the Flask-RESTful API instance.
-    """
     flask_app = Flask(__name__)
     flask_app.config.from_object(localConfig)
     flask_app.secret_key = flask_app.config.get('SECRET_KEY')
     bcrypt = Bcrypt(flask_app)
+
+
     # Initialize the database
     db.init_app(flask_app)
 
+
     # Initialize Flask-Mail
     mail = Mail(flask_app)
+
 
     flask_api = Api(flask_app)
     flask_app.app_context().push()
@@ -48,15 +41,17 @@ def create_app():
 
     # Create Celery
     clry = workers.clry
-    print("BROKER URL : ",flask_app.config['CELERY_BROKER_URL'])
-    print("BACKEND URL : ",flask_app.config['CELERY_RESULT_BACKEND'])
+    # print("BROKER URL : ",flask_app.config['CELERY_BROKER_URL'])
+    # print("BACKEND URL : ",flask_app.config['CELERY_RESULT_BACKEND'])
     clry.conf.update(
         broker_url = flask_app.config['CELERY_BROKER_URL'],
         result_backend = flask_app.config['CELERY_RESULT_BACKEND']
     )
     clry.Task = workers.ContextTask
     clry.conf.broker_connection_retry_on_startup = True
-    # CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "*"}})
+
+
+    CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "*"}})
     return flask_app, flask_api ,mail ,clry ,bcrypt
 
 
@@ -64,6 +59,27 @@ app, api, mail, clry ,bcrypt = create_app()
 
 
 from application.controller.controllers import *
+
+# from application.api.users import UserAPI, IsAdimn, IsPro
+from application.api.services import ServiceAPI
+from application.api.logout import LogoutAPI
+from application.api.register import RegisterAPI
+# from application.api.srvcreqs import ServiceRequestAPI
+from application.api.signin import SigninAPI,GoogleOAuthAPI,GoogleOAuthCallbackAPI,SignUpDetailsOAuthAPI
+# from application.api.professional import ProfessionalAPI
+
+# api.add_resource(UserAPI,"/api/user")
+api.add_resource(ServiceAPI,"/api/service")
+# API.add_resource(ServiceRequestAPI,"/api/srvcreq")
+api.add_resource(SigninAPI,"/api/signin")  
+api.add_resource(GoogleOAuthAPI,"/api/signin_google")
+api.add_resource(GoogleOAuthCallbackAPI,"/api/signin_google/callback")
+api.add_resource(SignUpDetailsOAuthAPI,"/api/signup_details/oauth/<string:username>/<string:name>/<string:encoded_url>","/api/signup_details/oauth")
+api.add_resource(LogoutAPI,"/api/logout")    
+api.add_resource(RegisterAPI,"/api/register")
+# API.add_resource(ProfessionalAPI,"/api/professional")
+# API.add_resource(IsAdimn,"/api/isadmin") 
+# API.add_resource(IsPro,"/api/ispro") 
 
 
 if __name__ == '__main__':
