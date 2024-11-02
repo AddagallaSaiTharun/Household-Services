@@ -12,7 +12,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(cur_dir, 'fixupcrew.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
 class test_config(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:" 
     PORT = 5000
