@@ -8,7 +8,19 @@ nav {
   border-radius: 20px;
   height: 0.8in;
 }
-
+.pro-card {
+  width: 2in;
+  height: 1in;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
 .navbar-brand {
   font-size: 20px;
   font-weight: bold;

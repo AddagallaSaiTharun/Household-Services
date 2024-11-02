@@ -89,6 +89,7 @@ class ProfessionalAPI(Resource):
         if error or role!="user":
             return json.dumps({'error': 'Unauthorized access'}), 401
         data = request.form
+
         if role == "user":
             required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
             if not all(field in data for field in required_fields):
