@@ -16,19 +16,22 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use 'ubuntu-latest' for Linux, or 'windows-latest' for Windows if desired
+    runs-on: windows-latest  # Run on a Windows environment
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.10
+
+      - name: Set up Python 3.12.6
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: "3.12.6"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if Test-Path requirements.txt; then pip install -r requirements.txt; fi
-        shell: bash  # Specify bash shell to handle if statement syntax
+          if (Test-Path requirements.txt) { pip install -r requirements.txt }
+        shell: pwsh  # Use PowerShell shell for Windows
+
       - name: Run tests
         run: |
-          pytest
+          pytest tests/
