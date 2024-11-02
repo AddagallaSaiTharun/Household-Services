@@ -14,8 +14,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
 class test_config(Config):
-    SQLITE_DB_DIR = os.path.join(cur_dir, "../tests/test_db")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "test_db.db")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:" 
     PORT = 5000
     HOST = "localhost"
     DEBUG = True
