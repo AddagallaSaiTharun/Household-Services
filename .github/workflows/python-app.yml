@@ -5,9 +5,14 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "*"          # Trigger on push to any branch
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - "*"          # Trigger on pull request to any branch
+  pull_request_target:
+    branches:
+      - "*"  
 
 permissions:
   contents: read
