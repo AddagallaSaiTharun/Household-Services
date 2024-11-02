@@ -58,4 +58,3 @@ class ServiceRequests(db.Model):  #Many
     cust_review = db.Column(db.String)  #Review given by customer to Prof
     prof_review = db.Column(db.String)  #Review given by customer to Prof
     
-db.create_all()

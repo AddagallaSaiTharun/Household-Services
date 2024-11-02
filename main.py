@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_restful import Api
 from application.data.database import db
 from application.config import localConfig
-# from application.jobs import workers
+from application.jobs import workers
 
 APP = None
 API = None
@@ -29,19 +29,17 @@ def create_app():
     # db.create_all()
     CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "Access-Control-Allow-Origin"}})
 
-    # flask_celery = workers.celery
-    # flask_celery.conf.update(
-    #     broker_url = flask_app.config["CELERY_BROKER_URL"],
-    #     result_backend = flask_app.config["CELERY_RESULT_BACKEND"]
-    # )
+    flask_celery = workers.celery
+    flask_celery.conf.update(
+        broker_url = flask_app.config["CELERY_BROKER_URL"],
+        result_backend = flask_app.config["CELERY_RESULT_BACKEND"]
+    )
 
-    # flask_celery.Task = workers.ContextTask
-    # flask_app.app_context().push()
-    # return flask_app, flask_api,flask_celery
+    flask_celery.Task = workers.ContextTask
+    flask_app.app_context().push()
+    return flask_app, flask_api,flask_celery
 
-    return flask_app, flask_api
-
-APP,API = create_app()
+APP,API,CEL = create_app()
 # APP,API,CELERY = create_app()
 
 from application.controller.controllers import *

@@ -12,7 +12,7 @@ const admin_home = Vue.component("admin-home", {
                             <p class="card-text">Pro of : {{ pro['service_name'] }}</p>
                             <p class="card-text">Pro for {{ pro['prof_exp'] }} years </p>
                             <p class="card-text">description {{ pro['prof_dscp'] }}</p>
-                            <button class="btn btn-primary">Submit Request</button>
+                            <button class="btn btn-primary" @click="approve_pro(pro.prof_userid)">Approve Pro</button>
                         </div>
                     </div>
                 </div>
@@ -27,14 +27,30 @@ const admin_home = Vue.component("admin-home", {
     };
   },
   methods: {
+    approve_pro(id) { 
+      try {
+        const res = axios.put(
+          "/api/professional",
+          {
+            prof_userid: id,
+            prof_ver: "1",
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + this.token,
+            },
+          }
+        );
+        window.location.reload();
+      } catch (error) {
+        console.error(error);
+      }
+    },
     add_service() {
       window.location.href = "/#/add_service";
     },
   },
   async created() {
-    if (!this.token) {
-      window.location.href = "/#/login";
-    }
     const response = await axios.get("/api/professional", {
       headers: {
         Authorization: "Bearer " + this.token,
@@ -63,7 +79,6 @@ const admin_home = Vue.component("admin-home", {
             Authorization: "Bearer " + this.token,
           },
         });
-        console.log(JSON.parse(name.data).message[0].first_name);
         pros[pro]["name"] = JSON.parse(name.data).message[0].first_name;
         console.log(pros[pro]);
 

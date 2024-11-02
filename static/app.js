@@ -7,6 +7,7 @@ import add_service from "./components/add_service.js";
 import service from "./components/service.js";
 import register_pro from "./components/register_pro.js";
 import service_grp from "./components/service_grp.js";
+import prohome from "./components/pro_home.js";
 
 const routes = [
   { path: "/", component: Home },

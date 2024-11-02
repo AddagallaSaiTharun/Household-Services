@@ -57,13 +57,6 @@ const service_grp = Vue.component("service_grp", {
     };
   },
   async created() {
-    for (service in this.services) {
-    }
-    if (!this.token) {
-      window.location.href = "/#/login";
-    }
-    
-
     try {
       const response = await axios.get("/api/service", {
         headers: {

@@ -12,6 +12,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(cur_dir, 'fixupcrew.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+class test_config(Config):
+    SQLITE_DB_DIR = os.path.join(cur_dir, "../tests/test_db")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "test_db.db")
+    PORT = 5000
+    HOST = "localhost"
+    DEBUG = True
 
 class localConfig(Config):
     SQLITE_DB_DIR = os.path.join(cur_dir, "../db_directory")

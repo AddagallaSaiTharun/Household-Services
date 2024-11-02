@@ -28,7 +28,8 @@ class UserLogin(Resource):
                 'name': user.first_name,
                 'address': user.address,
                 'address_link': user.address_link,
-            }, app.config['SECRET_KEY'])
+            }, app.config['SECRET_KEY'], 
+            )
 
             return json.dumps({
                 'token': token, 

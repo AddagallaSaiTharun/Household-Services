@@ -28,9 +28,6 @@ const register_pro = Vue.component("register_pro", {
       </div>
     `,
   async created() {
-    if (!this.token) {
-      window.location.href = "/#/login";
-    }
     try {
       this.user = await axios.get("/api/user", {
         headers: {
