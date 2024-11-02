@@ -6,7 +6,7 @@ from application.jobs import workers
 from application.config import localConfig
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
-
+import os
 
 
 
@@ -20,8 +20,9 @@ bcrypt = None
 
 
 
+
 def create_app():
-    flask_app = Flask(__name__)
+    flask_app = Flask(__name__,template_folder=os.path.join('..', 'frontend', 'templates'),static_folder=os.path.join('..', 'frontend', 'static'))
     flask_app.config.from_object(localConfig)
     flask_app.secret_key = flask_app.config.get('SECRET_KEY')
     bcrypt = Bcrypt(flask_app)
