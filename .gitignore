@@ -2,3 +2,4 @@
 /backend/.env
 ImportantNotes.txt
 /backend/celerybeat*
+/backend/db_directory
