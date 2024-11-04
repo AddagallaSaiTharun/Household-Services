@@ -31,6 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           if (Test-Path requirements.txt) { pip install -r requirements.txt }
         shell: pwsh  # Use PowerShell shell for Windows
+      - name: Remove __pycache__ directories
+      run: |
+        Get-ChildItem -Recurse -Force -Filter __pycache__ | Remove-Item -Recurse -Force
+      shell: pwsh
 
       - name: Run tests
         run: |

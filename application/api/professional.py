@@ -5,7 +5,6 @@ from application.data.database import db
 from application.data.models import  Professionals, Users
 import json
 from datetime import datetime
-from application.jobs.tasks import verify_pro
 import redis
 
 
