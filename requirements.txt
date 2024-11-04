@@ -19,3 +19,4 @@ pillow
 pytest
 flask-sse
 flask-mail
+apscheduler
