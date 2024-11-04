@@ -5,7 +5,12 @@ from application.data.database import db
 from application.data.models import  Professionals, Users
 import json
 from datetime import datetime
+from application.jobs.tasks import verify_pro
+import redis
 
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+channel_name = 'pro_verification_requests'
 class ProfessionalAPI(Resource):
     def get(self):
         """
@@ -17,6 +22,7 @@ class ProfessionalAPI(Resource):
             return json.dumps({'error': 'Unauthorized access'}), 401
         query = Professionals.query
         data = request.args.to_dict()
+        
         if data:
             for column in ["prof_userid", 'prof_exp', 'prof_dscp', 'prof_srvcid', 'prof_ver', 'prof_join_date']:
                 if column in data:
@@ -89,7 +95,6 @@ class ProfessionalAPI(Resource):
         if error or role!="user":
             return json.dumps({'error': 'Unauthorized access'}), 401
         data = request.form
-
         if role == "user":
             required_fields = ["prof_exp", "prof_dscp", "prof_srvcid", "prof_join_date"]
             if not all(field in data for field in required_fields):
@@ -97,7 +102,6 @@ class ProfessionalAPI(Resource):
                 return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
             user = Users.query.filter_by(user_id=user_id).first()
             user.role = "professional"
-
             prof = Professionals(
                 prof_userid=user_id,
                 prof_exp=data['prof_exp'],
@@ -105,6 +109,13 @@ class ProfessionalAPI(Resource):
                 prof_srvcid=data['prof_srvcid'],
                 prof_join_date=datetime.strptime(data['prof_join_date'], '%Y-%m-%d').date()
             )
+            data = dict(data)
             db.session.add(prof)
             db.session.commit()
-            return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid}), 201
+            data['user_id'] = user_id
+           
+            task_id = verify_pro.delay(data)
+            redis_client.publish(channel_name,task_id)
+
+            
+            return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201

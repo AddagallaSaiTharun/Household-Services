@@ -11,7 +11,7 @@ def generate_random_user_data():
         'first_name': fake.first_name(),
         'last_name': fake.last_name(),
         'age': random.randint(18, 65),  # Random age between 18 and 65
-        'role': random.choice(['admin', 'service professional', 'customer']),  # Random role
+        'role': random.choice(['admin', 'customer']),  # Random role
         'user_image_url': fake.image_url(),
         'password': fake.password(),  # You can customize the password generation as needed
         'phone': fake.phone_number(),
@@ -21,6 +21,8 @@ def generate_random_user_data():
         "gender": random.choice(["M","F","O"])
     }
     return user_data
+
+
 
 def generate_random_service_data():
     service_data = {

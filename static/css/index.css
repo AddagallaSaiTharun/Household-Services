@@ -21,6 +21,14 @@ nav {
   justify-content: center;
   align-items: flex-start;
 }
+.step {
+  margin-bottom: 20px;
+}
+.method {
+  color: #000000;
+  font-weight: bold;
+  font-size: 1rem;
+}
 .navbar-brand {
   font-size: 20px;
   font-weight: bold;

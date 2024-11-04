@@ -26,6 +26,15 @@ class localConfig(Config):
     PORT = 5000
     HOST = "localhost"
     DEBUG = True
+    REDIS_URL = "redis://localhost:6379/0"
+
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get('EMAIL_USER')  # Your Gmail address
+    MAIL_PASSWORD = os.environ.get('EMAIL_PASS')  # Your Gmail password
+    MAIL_DEFAULT_SENDER = os.environ.get('EMAIL_USER')  # Default sender for emails
+
 
 class oAuth_cred():
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')

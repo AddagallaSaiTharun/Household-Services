@@ -4,10 +4,19 @@ from flask_restful import Api
 from application.data.database import db
 from application.config import localConfig
 from application.jobs import workers
+from flask_sse import sse
+from apscheduler.schedulers.background import BackgroundScheduler
+import random
+from datetime import datetime
+import datetime
+from flask_mail import Mail
+
+
 
 APP = None
 API = None
 CELERY = None
+MAIL = None
 
 def create_app():
     """
@@ -25,6 +34,7 @@ def create_app():
     db.init_app(flask_app)
     flask_api = Api(flask_app)
     flask_app.app_context().push()
+    mail = Mail(flask_app)
     # from application.data.models import ServiceRequests,Services,Professionals,Users
     # db.create_all()
     CORS(flask_app, resources={r"/*" : {"origins" : "http://localhost:5000", "allow_headers" : "Access-Control-Allow-Origin"}})
@@ -36,14 +46,23 @@ def create_app():
     )
 
     flask_celery.Task = workers.ContextTask
+    flask_celery.broker_connection_retry_on_startup = True
     flask_app.app_context().push()
-    return flask_app, flask_api,flask_celery
+    return flask_app, flask_api,flask_celery, mail
 
-APP,API,CEL = create_app()
+APP,API,CEL, MAIL = create_app()
 # APP,API,CELERY = create_app()
 
+APP.register_blueprint(sse, url_prefix='/events')
+
+
+
+   
+
+
+
 from application.controller.controllers import *
-from application.api.users import UserAPI, IsAdimn, IsPro
+from application.api.users import UserAPI, IsAdimn, IsPro, HandleRequests
 from application.api.services import ServiceAPI
 from application.api.srvcreqs import ServiceRequestAPI
 from application.api.login import UserLogin
@@ -57,8 +76,12 @@ API.add_resource(UserLogin,"/api/login")
 API.add_resource(ProfessionalAPI,"/api/professional")
 API.add_resource(IsAdimn,"/api/isadmin") 
 API.add_resource(IsPro,"/api/ispro") 
+API.add_resource(HandleRequests,"/api/requests") 
+
+
 
 
 
 if __name__ == '__main__':
+
     APP.run(port=5000,host="0.0.0.0",debug=True)

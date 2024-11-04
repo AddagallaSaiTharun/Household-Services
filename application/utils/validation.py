@@ -1,5 +1,8 @@
 import jwt
 from flask import current_app as app
+from flask_sse import sse
+import datetime
+
 
 def preprocesjwt(request):
     auth_header = request.headers.get('Authorization')
@@ -12,3 +15,12 @@ def preprocesjwt(request):
             return None,None,None,True
     return None,None,None,True
     
+def get_data():
+    data = list()
+    data.append({'name': "tharun"})
+    return data
+
+def server_side_event():
+    with app.app_context():
+        sse.publish(get_data(), type='customer')
+        print("New Customer Time: ",datetime.datetime.now())

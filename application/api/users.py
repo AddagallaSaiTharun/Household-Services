@@ -7,8 +7,19 @@ import json
 from flask_bcrypt import Bcrypt
 from flask import current_app as app
 from datetime import datetime
+from application.jobs.tasks import redis_client
+
 
 bcrypt = Bcrypt(app)
+
+class HandleRequests(Resource):
+    def get(self):
+        _, role, _, error = preprocesjwt(request)
+        if error or role != "admin":
+            return json.dumps({'error': 'Unauthorized access'}), 401
+        tasks = redis_client.lrange("celery", 0, -1)
+        print(tasks)
+        return [json.loads(task) for task in tasks]
 
 
 class IsPro(Resource):
@@ -34,7 +45,6 @@ class IsAdimn(Resource):
         _, role, _, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
-
         if role == "admin":
             return True
         else:

@@ -1,6 +1,7 @@
 const admin_home = Vue.component("admin-home", {
   template: `
     <div>
+    <h1>{{ name }}</h1>
         <h2>This is the admin page</h2>
         <button class= "btn btn-primary" @click="add_service">Add_Service</button>
         <div class="row">
@@ -24,10 +25,12 @@ const admin_home = Vue.component("admin-home", {
     return {
       token: localStorage.getItem("token"),
       pros: [],
+      name: "",
+ 
     };
   },
   methods: {
-    approve_pro(id) { 
+    approve_pro(id) {
       try {
         const res = axios.put(
           "/api/professional",
@@ -51,6 +54,23 @@ const admin_home = Vue.component("admin-home", {
     },
   },
   async created() {
+    const source = new EventSource("http://127.0.0.1:5000/events");
+
+    source.addEventListener("customer", (event) => {
+      const data = JSON.parse(event.data);
+      this.name = data[0].name;
+    });
+
+    source.addEventListener("error", (event) => {
+      console.error("EventSource error:", event);
+    });
+
+    const requests = await axios.get("/api/requests", {
+      headers: {
+        Authorization: "Bearer " + this.token,
+      },
+    });
+    console.log(requests.data);
     const response = await axios.get("/api/professional", {
       headers: {
         Authorization: "Bearer " + this.token,
@@ -80,8 +100,6 @@ const admin_home = Vue.component("admin-home", {
           },
         });
         pros[pro]["name"] = JSON.parse(name.data).message[0].first_name;
-        console.log(pros[pro]);
-
         this.pros.push(pros[pro]);
       }
     }

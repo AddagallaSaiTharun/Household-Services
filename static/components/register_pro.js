@@ -66,8 +66,6 @@ const register_pro = Vue.component("register_pro", {
       formData.append("prof_srvcid", this.service_id);
       formData.append("prof_join_date", new Date().toISOString().split("T")[0]);
 
-
-
       try {
         const response = await axios.post(
           "/api/professional", formData,

@@ -17,3 +17,5 @@ flask-bcrypt
 PyJWT
 pillow
 pytest
+flask-sse
+flask-mail
