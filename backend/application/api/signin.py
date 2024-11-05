@@ -8,6 +8,7 @@ from application.jobs import tasks
 import jwt
 from authlib.integrations.flask_client import OAuth
 from datetime import datetime, timedelta, timezone
+from application.controller.sse import server_side_event
 
 
 
@@ -28,6 +29,8 @@ class SigninAPI(Resource):
     #Time Being
     def __init__(self):
         from main import bcrypt
+        self.bcrypt = bcrypt
+        
     def get(self):
         """
         Handle GET request to /api/signin
@@ -43,7 +46,7 @@ class SigninAPI(Resource):
         user_check=Users.query.filter(Users.user_name == username).first()
         response = None
         if user_check:
-            if bcrypt.check_password_hash(user_check.password, password):
+            if self.bcrypt.check_password_hash(user_check.password, password):
                 print("Password Check Successful.")
                 inject_csrf_token()
                 decoded_token = jwt.decode(request.cookies.get('token'), app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -94,6 +97,7 @@ class GoogleOAuthAPI(Resource):
         """
         # print(dir(google) )
         # print("Cookie token before login : ",request.cookies.get('token'))
+        server_side_event()
         redirect_uri = 'http://localhost:5000/api/signin_google/callback'
         return google.authorize_redirect(redirect_uri)
 

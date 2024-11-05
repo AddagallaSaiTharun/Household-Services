@@ -3,9 +3,6 @@ from flask import request,make_response,jsonify
 from application.data.database import db
 from application.data.models import Services
 from application.utils.validation import gen_uuid,check_role_admin,check_loggedIn_status,check_loggedIn_jwt_expiration,csrf_protect,decodeutf8,base64encode
-from PIL import Image
-from io import BytesIO
-import base64
 
 
 class ServiceAPI(Resource):
@@ -48,7 +45,6 @@ class ServiceAPI(Resource):
         response = make_response(jsonify({"content": result,"status":"success","flag":1}),200)
         response.headers['Content-Type'] = 'application/json'
         return response
-        # return json.dumps({"content": result})
     
 
     @check_role_admin
@@ -154,7 +150,7 @@ class ServiceAPI(Resource):
             try:
                 db.session.add(service)
                 db.session.commit()
-                response  = make_response(jsonify({"message":"Service registration successful.",'flag':1,"status":"success"}),201)
+                response  = make_response(jsonify({"message":"Service registration successful.",'flag':1,"status":"success"}),200)
             except Exception as e:
                 print("Rolling back. Issue with database Insertion",e)
                 db.session.rollback()

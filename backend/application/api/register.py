@@ -14,8 +14,10 @@ class RegisterAPI(Resource):
     """
     def __init__(self):
         from main import bcrypt
+        self.bcrypt = bcrypt
     def get(self):
-        return render_template("signup.html")
+        # return render_template("signup.html")
+        return make_response(render_template('signup.html'), 200, {'Content-Type': 'text/html'})
     """
     Handel POST request to /api/register
     """
@@ -36,9 +38,9 @@ class RegisterAPI(Resource):
         if checkPswd(password,confirm_password) and checkEmpty(username) and checkEmpty(firstname) and checkEmpty(lastname) and checkEmpty(phone) and checkEmpty(gender) and checkEmpty(pincode) and checkEmpty(address) and checkEmpty(address_link) and checkEmpty(role) and checkAge(age):
                 try:
                     if 'offersCheck' in request.form:
-                        new_user=Users(user_id=gen_uuid(),user_name=username,role=role,password=bcrypt.generate_password_hash(password).decode('utf-8'),first_name=firstname,last_name=lastname,age=age,gender=gender,phone=phone,address=address,address_link=address_link,pincode=pincode,offers_mail=1)
+                        new_user=Users(user_id=gen_uuid(),user_name=username,role=role,password=self.bcrypt.generate_password_hash(password).decode('utf-8'),first_name=firstname,last_name=lastname,age=age,gender=gender,phone=phone,address=address,address_link=address_link,pincode=pincode,offers_mail=1)
                     else:
-                        new_user=Users(user_id=gen_uuid(),user_name=username,role=role,password=bcrypt.generate_password_hash(password).decode('utf-8'),first_name=firstname,last_name=lastname,age=age,gender=gender,phone=phone,address=address,address_link=address_link,pincode=pincode)
+                        new_user=Users(user_id=gen_uuid(),user_name=username,role=role,password=self.bcrypt.generate_password_hash(password).decode('utf-8'),first_name=firstname,last_name=lastname,age=age,gender=gender,phone=phone,address=address,address_link=address_link,pincode=pincode)
                     db.session.add(new_user)
                     db.session.commit()
                     response = make_response(jsonify({'message': 'Registration successful','flag':1,'status': 'success'}),200)

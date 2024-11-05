@@ -14,7 +14,7 @@ class Services(db.Model): #One (One : Service , Many : Professionals)
 
 
 
-class Professionals(db.Model):  #Many   #One (One : Professionals , One : Users)  #One (One : Professionals , One : ServiceRequests)
+class Professionals(db.Model):  #Many   #One (One : Professionals , One : Users)  #One (One : Professionals , Many : ServiceRequests)
     __tablename__ = "professionals"
     prof_userid = db.Column(db.String,db.ForeignKey('users.user_id'),primary_key=True) #To retrieve details of the professional form the users table 
     prof_exp = db.Column(db.Integer,nullable=False,server_default=db.text('0'))  #Experience
@@ -26,7 +26,7 @@ class Professionals(db.Model):  #Many   #One (One : Professionals , One : Users)
     usr = db.relationship('Users', uselist=False ,backref="usr_professional",lazy=True)
 
 
-class Users(db.Model):  #One
+class Users(db.Model):  #One    #One (One : Users , Many: ServiceRequests)
     __tablename__ = "users"
     user_id = db.Column(db.String,primary_key = True)
     user_name = db.Column(db.String(50),nullable=False,unique=True) #Email
@@ -42,6 +42,7 @@ class Users(db.Model):  #One
     address_link = db.Column(db.String,nullable=False) #For Distance Matrix API from GMaps to measure distance for price calculation
     pincode = db.Column(db.Integer,nullable=False)
     offers_mail = db.Column(db.Integer,nullable=False,server_default=db.text('0'))
+    srvc_ords = db.relationship('ServiceRequests',backref="srvc_usr",lazy=True)
 
 
 class ServiceRequests(db.Model):  #Many
@@ -50,10 +51,10 @@ class ServiceRequests(db.Model):  #Many
     srvc_id = db.Column(db.String, db.ForeignKey('services.service_id'),nullable=False)
     customer_id = db.Column(db.String, db.ForeignKey('users.user_id'),nullable=False)
     prof_id = db.Column(db.String, db.ForeignKey('professionals.prof_userid'),nullable=False)
-    date_srvcreq = db.Column(db.Date,nullable=False)   #Default YYYY-MM-DD
-    date_cmpltreq = db.Column(db.Date,nullable=False)   #Default YYYY-MM-DD
-    srvc_status = db.Column(db.String,nullable=False)
-    remarks = db.Column(db.String) #Given by customer in Service request
+    date_srvcreq = db.Column(db.DateTime)   #Default YYYY-MM-DD
+    date_cmpltreq = db.Column(db.DateTime)   #Default YYYY-MM-DD
+    srvc_status = db.Column(db.String,nullable=False)  #"pending" or "accepted" or "rejected" 
+    remarks = db.Column(db.String) #Given by customer in Service request(Like visit timings)
     cust_rating = db.Column(db.Float)   #Rating given by customer to Prof
     prof_rating = db.Column(db.Float)   #Rating given by Prof to customer
     cust_review = db.Column(db.String)  #Review given by customer to Prof

@@ -7,6 +7,7 @@ from application.config import localConfig
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 
@@ -58,8 +59,7 @@ def create_app():
 
 app, api, mail, clry ,bcrypt = create_app()
 
-
-# from application.controller.controllers import *
+from application.controller.controllers import *
 
 # from application.api.users import UserAPI, IsAdimn, IsPro
 from application.api.services import ServiceAPI

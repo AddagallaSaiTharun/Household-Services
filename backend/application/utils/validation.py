@@ -8,6 +8,8 @@ import uuid
 from PIL import Image
 from io import BytesIO
 import base64
+from flask_sse import sse
+from datetime import datetime
 
 
 # def preprocesjwt(request):
@@ -135,7 +137,7 @@ def check_role_admin(f):
     def decorated_function(*args, **kwargs):
         response = None
         decoded_token = jwt.decode(request.cookies.get('token'), app.config['SECRET_KEY'], algorithms=['HS256'])
-        if decoded_token["role"] == "admin":
+        if decoded_token["admin"] == "1":
             return f(*args,**kwargs)
         else:
             response = make_response(jsonify({"message": "Access Denied!","flag":0,"status": "failure"}), 403)
@@ -225,3 +227,5 @@ def replace_with_chars(input_str):
         input_str = input_str.replace(ascii_value, char)
     
     return input_str
+
+
