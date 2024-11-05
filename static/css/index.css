@@ -8,8 +8,59 @@ nav {
   border-radius: 20px;
   height: 0.8in;
 }
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex; /* Allows positioning of bell icon and text side-by-side */
+  align-items: center;
+  background-color: #ffffff00;
+  color: #000000;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.101);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  max-width: 8in;
+  z-index: 1000;
+}
+
+/* Bell icon within the notification */
+.notification-bell {
+  font-size: 24px;
+  color: #000000; /* Distinct color for the bell icon */
+  margin-right: 10px; /* Space between bell icon and text */
+  animation: shake 0.5s ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Show notification */
+.notification.show {
+  opacity: 1;
+}
+
+/* Shake Animation for the Bell Icon */
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-15deg);
+  }
+  40%,
+  80% {
+    transform: rotate(15deg);
+  }
+}
+
+
+
+
 .pro-card {
-  width: 2in;
+  width: 2.8in;
   height: 1in;
   border: 1px solid #ccc;
   border-radius: 5px;

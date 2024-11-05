@@ -14,6 +14,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
     CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+    SSE_REDIS_URL = "redis://localhost:6379/0"
 class test_config(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:" 
     PORT = 5000
@@ -27,6 +28,7 @@ class localConfig(Config):
     HOST = "localhost"
     DEBUG = True
     REDIS_URL = "redis://localhost:6379/0"
+    SSE_REDIS_URL = "redis://localhost:6379/0"
 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587

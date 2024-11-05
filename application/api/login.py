@@ -7,25 +7,13 @@ import json
 from flask_bcrypt import Bcrypt
 from flask import current_app as app
 import jwt
-from application.utils.validation import server_side_event
 from application.jobs import tasks
-
+from application.jobs.sse import server_side_event
+from apscheduler.schedulers.background import BackgroundScheduler
 
 bcrypt = Bcrypt(app)
 
 class UserLogin(Resource):
-    def get(self):
-        email = "varun.merugu1212@gmail.com"
-        subject = "Registration"
-        body = f"""
-            <p><b>Welcome to Household Services.</b></p>
-            <p>Login into the website with the registered username and password</p>
-            <p>Looking forward to serve you :)</p>
-            <p><b>Thank you for registering!</b></p>
-        """
-        # Call the Celery task
-        job = tasks.send_registration_email.delay(email, subject, body)
-        return "hell0"
     def post(self):
         """
         Logs in user with credentials from request body (JSON)
@@ -45,7 +33,10 @@ class UserLogin(Resource):
                 'address_link': user.address_link,
             }, app.config['SECRET_KEY'], 
             )
-
+            if user.role == "professional":
+                ver = Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver
+                if ver == 0:
+                    server_side_event({"request" : True})
             return json.dumps({
                 'token': token, 
                 'message': 'Login successful',
