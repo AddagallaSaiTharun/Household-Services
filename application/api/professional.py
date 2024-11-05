@@ -4,6 +4,7 @@ from application.utils.validation import preprocesjwt
 from application.data.database import db
 from application.data.models import  Professionals, Users
 import json
+from application.jobs.sse import server_side_event
 from datetime import datetime
 import redis
 
@@ -112,9 +113,5 @@ class ProfessionalAPI(Resource):
             db.session.add(prof)
             db.session.commit()
             data['user_id'] = user_id
-           
-            task_id = verify_pro.delay(data)
-            redis_client.publish(channel_name,task_id)
-
-            
+            server_side_event() 
             return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201

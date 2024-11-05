@@ -57,8 +57,8 @@ const admin_home = Vue.component("admin-home", {
     const source = new EventSource("http://127.0.0.1:5000/events");
 
     source.addEventListener("customer", (event) => {
-      const data = JSON.parse(event.data);
-      this.name = data[0].name;
+      const data = event.data;
+      this.name = data;
     });
 
     source.addEventListener("error", (event) => {

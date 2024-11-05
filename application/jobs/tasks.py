@@ -1,7 +1,4 @@
 from application.jobs.workers import celery
-import redis
-import json
-
 from flask_mail import Message
 
 
