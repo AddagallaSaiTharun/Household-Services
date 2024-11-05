@@ -8,7 +8,6 @@ from flask_sse import sse
 from flask_mail import Mail
 from apscheduler.schedulers.background import BackgroundScheduler
 # Initialize the Flask extensions
-from application.jobs.sse import server_side_event
 
 app = None
 api = None
@@ -27,6 +26,7 @@ def create_app():
     db.init_app(flask_app)
     mail = Mail(flask_app)
     flask_api = Api(flask_app)
+    flask_app.app_context().push()
 
     # Setting up CORS
     CORS(flask_app, resources={r"/*": {"origins": "http://localhost:5000", "allow_headers": "Access-Control-Allow-Origin"}})
@@ -43,14 +43,13 @@ def create_app():
     flask_celery.broker_connection_retry_on_startup = True
 
     # Register blueprints
-    flask_app.register_blueprint(sse, url_prefix='/events')
-    flask_app.app_context().push()
  
 
     return flask_app, flask_api, flask_celery, mail
 
 # Global variables assigned by calling create_app()
 app, api, celery, mail = create_app()
+
 
 # Import resources after app is created
 from application.controller.controllers import *

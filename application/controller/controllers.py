@@ -56,22 +56,3 @@ import redis
 from celery.result import AsyncResult
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 channel_name = 'pro_verification_requests'  # Red
-
-
-@app.route('/admin/notifications', methods=['GET'])
-def admin_notifications():
-    def stream():
-        pubsub = redis_client.pubsub()
-        pubsub.subscribe(channel_name)
-        
-        for message in pubsub.listen():
-            print("message ", message)
-
-            task = AsyncResult(message)
-
-
-
-            if message['type'] == 'message':
-                yield f"data: {message['data'].decode()}\n\n"
-    
-    return Response(stream(), mimetype='text/event-stream')

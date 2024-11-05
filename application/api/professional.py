@@ -7,6 +7,8 @@ import json
 from application.jobs.sse import server_side_event
 from datetime import datetime
 import redis
+from application.jobs import tasks
+
 
 
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
@@ -59,6 +61,17 @@ class ProfessionalAPI(Resource):
             for column in ["prof_exp", "prof_dscp", "prof_srvcid", "prof_ver", "prof_join_date"]:
                 if column in data:
                     setattr(professional, column, data[column])
+                    print(column)
+                    if column == "prof_ver":
+                        email = Users.query.filter_by(user_id=data["prof_userid"]).first().email
+                        subject = "Professional Registration"
+                        body = f"""
+                            <p><b>Welcome to Household Services.</b></p>
+                            <p>You are a certified professional now. :)</p>
+                            <p>Login into the website with the registered username and password</p>
+                            <p><b>Thank you for beinga  part of us!</b></p>
+                        """
+                        tasks.send_registration_email.delay(email, subject, body)
             db.session.commit()
             return json.dumps({'message': 'Professional updated successfully'}), 200
 
@@ -113,5 +126,5 @@ class ProfessionalAPI(Resource):
             db.session.add(prof)
             db.session.commit()
             data['user_id'] = user_id
-            server_side_event() 
+            server_side_event({"request" : True})
             return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201

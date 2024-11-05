@@ -14,18 +14,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 bcrypt = Bcrypt(app)
 
 class UserLogin(Resource):
-    # def get(self):
-    #     email = "varun.merugu1212@gmail.com"
-    #     subject = "Registration"
-    #     body = f"""
-    #         <p><b>Welcome to Household Services.</b></p>
-    #         <p>Login into the website with the registered username and password</p>
-    #         <p>Looking forward to serve you :)</p>
-    #         <p><b>Thank you for registering!</b></p>
-    #     """
-    #     # Call the Celery task
-    #     job = tasks.send_registration_email.delay(email, subject, body)
-    #     return "hell0"
     def post(self):
         """
         Logs in user with credentials from request body (JSON)
@@ -46,9 +34,9 @@ class UserLogin(Resource):
             }, app.config['SECRET_KEY'], 
             )
             if user.role == "professional":
-                sched = BackgroundScheduler(daemon=True)
-                sched.add_job(server_side_event,'interval',seconds=10, id ="myJob")
-                sched.start()    
+                ver = Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver
+                if ver == 0:
+                    server_side_event({"request" : True})
             return json.dumps({
                 'token': token, 
                 'message': 'Login successful',
