@@ -9,6 +9,25 @@ import register_pro from "./components/register_pro.js";
 import service_grp from "./components/service_grp.js";
 import prohome from "./components/pro_home.js";
 
+
+async function validate_token(){
+  try {
+    const token_check = await axios.get("/api/user", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+  } catch (error) {
+    if (error.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/#/login";
+    }
+  }
+}
+
+setInterval(validate_token, 10000)
+
 const routes = [
   { path: "/", component: Home },
   { path: "/login", component: Login },

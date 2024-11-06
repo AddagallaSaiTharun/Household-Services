@@ -39,13 +39,13 @@ const navbar = Vue.component("navbar", {
       </nav>
   
     `,
-    data() {
-      return {
-        token: localStorage.getItem("token"),
-        isAdmin: false,
-        isPro: false
-      }
-    },
+  data() {
+    return {
+      token: localStorage.getItem("token"),
+      isAdmin: false,
+      isPro: false,
+    };
+  },
   computed: {
     isUserLoggedIn() {
       return !!localStorage.getItem("user");
@@ -70,8 +70,6 @@ const navbar = Vue.component("navbar", {
       }
     },
 
-
-
     logout() {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
@@ -82,20 +80,37 @@ const navbar = Vue.component("navbar", {
     if (!this.token) {
       window.location.href = "/#/login";
     }
-    const response = await axios.get("/api/isadmin", {
-      headers: {
-        Authorization: "Bearer " + this.token,
-      },
-    });
-    this.isAdmin = response.data;
+    try {
+      const response = await axios.get("/api/isadmin", {
+        headers: {
+          Authorization: "Bearer " + this.token,
+        },
+      });
+      this.isAdmin = response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Handle unauthorized error for admin check
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/#/login";
+      }
+    }
 
-    const pro_data = await axios.get("/api/ispro",{
-      headers: {
-        Authorization: "Bearer " + this.token,
-      }   
-    })
-    this.isPro = pro_data.data;
-    
+    try {
+      const pro_data = await axios.get("/api/ispro", {
+        headers: {
+          Authorization: "Bearer " + this.token,
+        },
+      });
+      this.isPro = pro_data.data;
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Handle unauthorized error for pro check
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/#/login";
+      }
+    }
   },
 });
 

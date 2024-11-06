@@ -6,7 +6,7 @@ const service = Vue.component("service", {
       </div>
       <div style="display: flex; justify-content: space-evenly">
         <div style="width: 20%">
-          <img style="width: 100%" src="/static/images/tvr.jpg" alt="" />
+          <img style="width: 100%; border-radius: 20px" :src="'/static/images/' + service_id + '.jpg'" alt="" />
         </div>
         <div style="width: 76%">
           <div
@@ -29,12 +29,12 @@ const service = Vue.component("service", {
             </div>
 
             <div class="step">
-              <p class="method">🌟Restore full functionality to the TV.</p>
+              <p class="method">🌟Restore full functionality via the Service.</p>
             </div>
 
             <div class="step">
               <p class="method">
-                🌟Confirm the issue is resolved, and the TV operates like new.
+                🌟Confirm the issue is resolved, and the machine operates like new.
               </p>
             </div>
 
@@ -70,7 +70,7 @@ const service = Vue.component("service", {
           </div>
 
           <p><strong>Professional ID:</strong> {{ pro.prof_userid }}</p>
-          <p><strong>Name:</strong> {{ pro.pro_name }}</p>
+          <p><strong>Name:</strong> {{ pro.username }}</p>
           <p><strong>Experience:</strong> {{ pro.prof_exp }} years</p>
           <button @click=book()>Book Now</button>
         </div>
@@ -108,22 +108,6 @@ const service = Vue.component("service", {
       },
     });
     this.pros = JSON.parse(pros.data).message;
-    for (const pro of this.pros) {
-      try {
-        const name = await axios.get("api/user", {
-          params: {
-            user_id: pro.prof_userid,
-          },
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-        });
-        pro.pro_name = JSON.parse(name.data).message.first_name;
-      } catch (error) {
-        console.error("Error fetching user name:", error);
-      }
-    }
-    this.pros = [...this.pros];
   },
 });
 

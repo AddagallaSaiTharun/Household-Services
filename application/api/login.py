@@ -10,7 +10,7 @@ import jwt
 from application.jobs import tasks
 from application.jobs.sse import server_side_event
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from datetime import datetime, timedelta
 bcrypt = Bcrypt(app)
 
 class UserLogin(Resource):
@@ -43,12 +43,11 @@ class UserLogin(Resource):
                 'name': user.first_name,
                 'address': user.address,
                 'address_link': user.address_link,
+                'exp': datetime.utcnow() + timedelta(minutes=30)
             }, app.config['SECRET_KEY'], 
             )
-            if user.role == "professional":
-                sched = BackgroundScheduler(daemon=True)
-                sched.add_job(server_side_event,'interval',seconds=10, id ="myJob")
-                sched.start()    
+            if user.role == "professional" and Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver == 0:
+                server_side_event()   
             return json.dumps({
                 'token': token, 
                 'message': 'Login successful',

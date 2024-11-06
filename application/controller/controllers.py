@@ -1,10 +1,12 @@
 from flask import current_app as app
-from flask import render_template, url_for, session, Response
+from flask import render_template, url_for, session, Response, request
 from authlib.integrations.flask_client import OAuth
 from application.config import oAuth_cred
 from application.data.database import db
 import jwt
 import json
+from application.utils.validation import preprocesjwt
+
 
 oauth  = OAuth(app)
 
@@ -75,3 +77,11 @@ def admin_notifications():
                 yield f"data: {message['data'].decode()}\n\n"
     
     return Response(stream(), mimetype='text/event-stream')
+
+
+@app.route("/validate_token", methods=["GET"])
+def validate_token():
+    _, role, _, error = preprocesjwt(request)
+    if error:
+        return json.dumps({'error': 'Unauthorized access'}), 401
+    return json.dumps({'message': 'Token is valid', 'role': role}), 200
