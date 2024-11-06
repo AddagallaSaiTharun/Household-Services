@@ -54,6 +54,11 @@ class UserAPI(Resource):
             return json.dumps({'error': 'Unauthorized access'}), 401
 
         user_col = ["user_id", 'email', 'first_name', 'last_name', 'age', 'gender', 'role', 'user_image_url', 'password', 'phone', 'address', 'address_link', 'pincode']        
+        if role == "professional":
+            if user:
+                return json.dumps({"message": {'user_id': user.user_id, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, 'age': user.age, 'gender': user.gender, 'role': user.role, 'user_image_url': user.user_image_url, 'password': user.password, 'phone': user.phone, 'address': user.address, 'address_link': user.address_link, 'pincode': user.pincode}})
+            else:
+                return json.dumps({"error": "User not found"}), 404
 
         if role == "user":
             user = Users.query.filter_by(user_id=user_id).first()

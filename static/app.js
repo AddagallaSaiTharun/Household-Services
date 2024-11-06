@@ -10,10 +10,7 @@ import service_grp from "./components/service_grp.js";
 import prohome from "./components/pro_home.js";
 import noti from "./components/notification.js";
 
-
-
-
-async function validate_token(){
+async function validate_token() {
   try {
     const token_check = await axios.get("/validate_token", {
       headers: {
@@ -28,8 +25,9 @@ async function validate_token(){
     }
   }
 }
-
-setInterval(validate_token, 10000)
+if (localStorage.getItem("token")) {
+  setInterval(validate_token, 10000);
+}
 
 const routes = [
   { path: "/", component: Home },
@@ -39,7 +37,6 @@ const routes = [
   { path: "/service/:id", component: service },
   { path: "/register_pro", component: register_pro },
 ];
-
 
 const router = new VueRouter({
   routes,

@@ -20,9 +20,7 @@ const prohome = Vue.component("prohome", {
     };
   },
   methods: {
-    verify() {
-        return 1;
-    }
+
   },
   async created() {
     const response = await axios.get("api/professional", {
