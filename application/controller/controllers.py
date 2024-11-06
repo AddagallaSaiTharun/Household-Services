@@ -3,6 +3,7 @@ from flask import render_template, url_for, session, Response, request
 from authlib.integrations.flask_client import OAuth
 from application.config import oAuth_cred
 from application.data.database import db
+from application.data.models import Professionals
 import jwt
 import json
 from application.utils.validation import preprocesjwt
@@ -85,3 +86,6 @@ def validate_token():
     if error:
         return json.dumps({'error': 'Unauthorized access'}), 401
     return json.dumps({'message': 'Token is valid', 'role': role}), 200
+
+
+

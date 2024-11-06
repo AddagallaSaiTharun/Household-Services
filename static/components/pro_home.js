@@ -14,7 +14,7 @@ const prohome = Vue.component("prohome", {
     `,
   data() {
     return {
-      usernamer: localStorage.getItem("user"),
+      username: localStorage.getItem("user"),
       token: localStorage.getItem("token"),
       verified: false,
     };
@@ -25,16 +25,18 @@ const prohome = Vue.component("prohome", {
     }
   },
   async created() {
-    const response = await axios.get("/api/professional", {
+    const response = await axios.get("api/professional", {
       headers: {
         Authorization: "Bearer " + this.token,
       },
+      params:{
+        self: true
+      }
     });
     const data = JSON.parse(response.data);
     if (data.message && data.message.length) {
       this.verified = true;
     }
-
   },
 });
 

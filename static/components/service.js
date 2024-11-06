@@ -57,15 +57,16 @@ const service = Vue.component("service", {
           v-for="pro in pros"
           :key="pro.prof_userid"
           class="pro-card"
-          style="height: max-content"
+          style="height: max-content;width:2.5in"
         >
+        <center>
           <div
             style="
               justify-content: space-around;
-              align-items: center;
               display: flex;
             "
           >
+          
             <img width="90%" src="/static/icons/profile_big.jpg" alt="" />
           </div>
 
@@ -73,6 +74,7 @@ const service = Vue.component("service", {
           <p><strong>Name:</strong> {{ pro.username }}</p>
           <p><strong>Experience:</strong> {{ pro.prof_exp }} years</p>
           <button @click=book()>Book Now</button>
+          <center>
         </div>
         
       </div>

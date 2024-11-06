@@ -15,7 +15,7 @@ import noti from "./components/notification.js";
 
 async function validate_token(){
   try {
-    const token_check = await axios.get("/api/user", {
+    const token_check = await axios.get("/validate_token", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },

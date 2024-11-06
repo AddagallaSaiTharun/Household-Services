@@ -11,15 +11,14 @@ from application.jobs import tasks
 
 
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
-channel_name = 'pro_verification_requests'
+
 class ProfessionalAPI(Resource):
     def get(self):
         """
         Returns professionals based on the data in the request. 
         If no data is provided, returns all professionals.
         """
-        _, role, _, error = preprocesjwt(request)
+        user_id, role, _, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
         query = Professionals.query
@@ -29,12 +28,15 @@ class ProfessionalAPI(Resource):
             for column in ["prof_userid", 'prof_exp', 'prof_dscp', 'prof_srvcid', 'prof_ver', 'prof_join_date']:
                 if column in data:
                     query = query.filter(getattr(Professionals, column) == data[column])
+        
         if role == "admin":
             professionals = query.all()
-            return json.dumps({"message": [{'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
+            return json.dumps({"message": [{'username' : professional.usr.first_name,'email' : professional.usr.email,'url' : professional.usr.user_image_url,'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
         else:
-            professionals = query.filter_by(prof_ver=1).all()
-            return json.dumps({"message": [{'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
+            if "self" in data:
+                query = query.filter_by(prof_userid=user_id)
+            professionals = query.filter_by(prof_ver="1").all()
+            return json.dumps({"message": [{'username' : professional.usr.first_name,'email' : professional.usr.email,'url' : professional.usr.user_image_url,'prof_userid': professional.prof_userid, 'prof_exp': professional.prof_exp, 'prof_dscp': professional.prof_dscp, 'prof_srvcid': professional.prof_srvcid, 'prof_ver': professional.prof_ver, 'prof_join_date': professional.prof_join_date.isoformat()} for professional in professionals]})
 
     def put(self):
         """
