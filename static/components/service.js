@@ -47,11 +47,9 @@ const service = Vue.component("service", {
           </div>
         </div>
       </div>
-
       <div style="font-size: 30px">
         Professionals
       </div>
-
       <div v-if="pros.length">
         <div
           v-for="pro in pros"
