@@ -8,6 +8,9 @@ import service from "./components/service.js";
 import register_pro from "./components/register_pro.js";
 import service_grp from "./components/service_grp.js";
 import prohome from "./components/pro_home.js";
+import noti from "./components/notification.js";
+
+
 
 
 async function validate_token(){
