@@ -95,10 +95,15 @@ const Home = Vue.component("home-component", {
           <service_grp></service_grp>
         </div>
       </div>
+      <div v-if="!isAdmin && !isPro">
+        <div v-if="notification" :class="['notification', { show: isVisible }]">
+          <div class="notification-bell">
+            <i class="fas fa-bell"></i>
+          </div>
+          {{notification.msg}}<a href="/">view</a>
+        </div>
+      </div>
     </div>
-
-  
-
 
   `,
   data() {
@@ -108,9 +113,19 @@ const Home = Vue.component("home-component", {
       isAdmin: null,
       isPro: null,
       services: [],
+      notification: null,
+      isVisible: false,
+      hideTimeout: null,
     };
   },
-  async created() {
+  watch: {
+    notification(newValue) {
+      if (newValue) {
+        this.showNotification();
+      }
+    },
+  },
+  async beforeCreate() {
     try {
       const response = await axios.get("/api/isadmin", {
         headers: {
@@ -140,11 +155,41 @@ const Home = Vue.component("home-component", {
       console.error("Error fetching service data:", error);
     }
   },
+  async created() {
+    this.setupEventSource();
+    
+  },
   methods: {
     open_service(id) {
       window.location.href = "/#/service/" + id;
     },
+    setupEventSource() {
+      const source = new EventSource("http://127.0.0.1:5000/events");
+
+      source.addEventListener("user", (event) => {
+        const data = JSON.parse(event.data);
+        this.notification = data; 
+        console.log(this.notification)
+      });
+
+
+      source.addEventListener("error", (event) => {
+        console.error("EventSource error:", event);
+        source.close(); 
+        setTimeout(() => this.setupEventSource(), 5000); 
+      });
+    },
+    showNotification() {
+      this.isVisible = true;
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = setTimeout(() => {
+        this.isVisible = false;
+      }, 10000); // Hide after 5 seconds
+    },
   },
+  beforeDestroy() {
+    clearTimeout(this.hideTimeout);
+  }
 });
 
 export default Home;

@@ -79,13 +79,3 @@ def admin_notifications():
     
     return Response(stream(), mimetype='text/event-stream')
 
-
-@app.route("/validate_token", methods=["GET"])
-def validate_token():
-    _, role, _, error = preprocesjwt(request)
-    if error:
-        return json.dumps({'error': 'Unauthorized access'}), 401
-    return json.dumps({'message': 'Token is valid', 'role': role}), 200
-
-
-

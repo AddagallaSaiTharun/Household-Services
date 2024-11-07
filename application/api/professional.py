@@ -116,6 +116,6 @@ class ProfessionalAPI(Resource):
             data = dict(data)
             db.session.add(prof)
             db.session.commit()
-            data['user_id'] = user_id
-            server_side_event() 
+            
+            server_side_event({"msg" : "new request!"}) 
             return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201
