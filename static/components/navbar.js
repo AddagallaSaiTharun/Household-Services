@@ -80,35 +80,37 @@ const navbar = Vue.component("navbar", {
     if (!this.token) {
       window.location.href = "/#/login";
     }
-    try {
-      const response = await axios.get("/api/isadmin", {
-        headers: {
-          Authorization: "Bearer " + this.token,
-        },
-      });
-      this.isAdmin = response.data;
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Handle unauthorized error for admin check
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/#/login";
+    if (this.token) {
+      try {
+        const response = await axios.get("/api/isadmin", {
+          headers: {
+            Authorization: "Bearer " + this.token,
+          },
+        });
+        this.isAdmin = response.data;
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Handle unauthorized error for admin check
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/#/login";
+        }
       }
-    }
 
-    try {
-      const pro_data = await axios.get("/api/ispro", {
-        headers: {
-          Authorization: "Bearer " + this.token,
-        },
-      });
-      this.isPro = pro_data.data;
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Handle unauthorized error for pro check
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/#/login";
+      try {
+        const pro_data = await axios.get("/api/ispro", {
+          headers: {
+            Authorization: "Bearer " + this.token,
+          },
+        });
+        this.isPro = pro_data.data;
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Handle unauthorized error for pro check
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/#/login";
+        }
       }
     }
   },

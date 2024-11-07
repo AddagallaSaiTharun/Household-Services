@@ -9,25 +9,13 @@ import register_pro from "./components/register_pro.js";
 import service_grp from "./components/service_grp.js";
 import prohome from "./components/pro_home.js";
 import noti from "./components/notification.js";
+import user_stats from "./components/user_stats.js";
+import current_order from "./components/current_order.js";
+import serv_req_form from "./components/serv_req_form.js";
 
-async function validate_token() {
-  try {
-    const token_check = await axios.get("/api/user", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-  } catch (error) {
-    if (error.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/#/login";
-    }
-  }
-}
-if (localStorage.getItem("token")) {
-  setInterval(validate_token, 10000);
-}
+
+
+
 
 const routes = [
   { path: "/", component: Home },

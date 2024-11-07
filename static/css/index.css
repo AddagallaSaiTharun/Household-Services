@@ -3,10 +3,11 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #f3f3f3;
+  background-color: #ffffff;
   color: #000000;
   border-radius: 20px;
   height: 0.8in;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);;
 }
 
 .notification {
@@ -40,28 +41,33 @@ nav {
   opacity: 1;
 }
 
-/* Shake Animation for the Bell Icon */
+
+
+.clock-container {
+  display: inline-block;
+  animation: shake 0.5s infinite;
+  margin-top: 10px;
+}
+
 @keyframes shake {
   0%,
   100% {
     transform: rotate(0);
   }
-  20%,
-  60% {
-    transform: rotate(-15deg);
+  25% {
+    transform: rotate(-10deg);
   }
-  40%,
-  80% {
-    transform: rotate(15deg);
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
   }
 }
 
-
-
-
 .pro-card {
-  width: 2.8in;
-  height: 1in;
+  width: 2.5in;
+  height: max-content;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin: 10px 0;

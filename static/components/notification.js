@@ -66,7 +66,6 @@ const noti = Vue.component("noti", {
   async created() {
     await this.checkAdminStatus();
     if (this.isAdmin) {
-      console.log("notify");
       this.setupEventSource();
     }
   },

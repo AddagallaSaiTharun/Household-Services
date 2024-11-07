@@ -3,8 +3,18 @@ from flask import current_app as app
 import json
 app.register_blueprint(sse, url_prefix='/events')
 
+
 def server_side_event(data):
     with app.app_context():
         sse.publish(data, type='customer')
         return
    
+def prof_req(data):
+    with app.app_context():
+        sse.publish(data, type='professional')
+        return
+
+def req_accept(data):
+    with app.app_context():
+        sse.publish(data, type='user')
+        return
