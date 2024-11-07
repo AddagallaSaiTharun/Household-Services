@@ -51,8 +51,8 @@ class ServiceRequests(db.Model):  #Many
     srvc_id = db.Column(db.String, db.ForeignKey('services.service_id'),nullable=False)
     customer_id = db.Column(db.String, db.ForeignKey('users.user_id'),nullable=False)
     prof_id = db.Column(db.String, db.ForeignKey('professionals.prof_userid'),nullable=False)
-    date_srvcreq = db.Column(db.DateTime)   #Default YYYY-MM-DD
-    date_cmpltreq = db.Column(db.DateTime)   #Default YYYY-MM-DD
+    date_srvcreq = db.Column(db.DateTime)   #Default YYYY-MM-DD HH:MM:SS
+    date_cmpltreq = db.Column(db.DateTime)   #Default YYYY-MM-DD HH:MM:SS
     srvc_status = db.Column(db.String,nullable=False)  #"pending" or "accepted" or "rejected" 
     remarks = db.Column(db.String) #Given by customer in Service request(Like visit timings)
     cust_rating = db.Column(db.Float)   #Rating given by customer to Prof

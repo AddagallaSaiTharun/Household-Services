@@ -66,13 +66,12 @@ from application.api.services import ServiceAPI
 from application.api.logout import LogoutAPI
 from application.api.register import RegisterAPI
 from application.controller.controllers import HomePage
-# from application.api.srvcreqs import ServiceRequestAPI
+from application.api.servicereq import ServiceRequestAPI
 from application.api.signin import SigninAPI,GoogleOAuthAPI,GoogleOAuthCallbackAPI,SignUpDetailsOAuthAPI
 # from application.api.professional import ProfessionalAPI
 
 # api.add_resource(UserAPI,"/api/user")
 api.add_resource(ServiceAPI,"/api/service")
-# API.add_resource(ServiceRequestAPI,"/api/srvcreq")
 api.add_resource(SigninAPI,"/api/signin")  
 api.add_resource(GoogleOAuthAPI,"/api/signin_google")
 api.add_resource(GoogleOAuthCallbackAPI,"/api/signin_google/callback")
@@ -80,6 +79,7 @@ api.add_resource(SignUpDetailsOAuthAPI,"/api/signup_details/oauth/<string:userna
 api.add_resource(LogoutAPI,"/api/logout")    
 api.add_resource(RegisterAPI,"/api/register")
 api.add_resource(HomePage, '/', '/index')
+api.add_resource(ServiceRequestAPI,'/api/srvc_req/<string:id>/<string:flag>','/api/srvc_req')
 # API.add_resource(ProfessionalAPI,"/api/professional")
 # API.add_resource(IsAdimn,"/api/isadmin") 
 # API.add_resource(IsPro,"/api/ispro") 

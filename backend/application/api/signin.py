@@ -97,7 +97,8 @@ class GoogleOAuthAPI(Resource):
         """
         # print(dir(google) )
         # print("Cookie token before login : ",request.cookies.get('token'))
-        server_side_event()
+        #Time being below sse
+        server_side_event(msg = "Recieved from ghjkl dfghjk" , link = "http://localhost:5000/api/register", type = "customer")
         redirect_uri = 'http://localhost:5000/api/signin_google/callback'
         return google.authorize_redirect(redirect_uri)
 

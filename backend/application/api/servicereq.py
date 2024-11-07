@@ -4,17 +4,22 @@ from flask_restful import Resource
 from flask import request, make_response, jsonify
 from application.utils.validation import check_loggedIn_jwt_expiration,csrf_protect,check_loggedIn_status,check_role_cust
 from application.data.database import db
-from application.data.models import ServiceRequests
+from application.data.models import ServiceRequests, Services
+from application.controller.sse import server_side_event
 import jwt
 
 class ServiceRequestAPI(Resource):
     """
     API resource for managing service requests.
+    /api/srvc_req
+    """
+    """
+    Handle GET request to /api/srvc_req
     """
     @check_loggedIn_status
     @csrf_protect
     @check_loggedIn_jwt_expiration
-    def get(self,id=None):
+    def get(self,id=None,flag=None):
         """
         Retrieves service requests based on user role and provided filters.
 
@@ -25,97 +30,172 @@ class ServiceRequestAPI(Resource):
         role = decoded_token['role']
         admin = decoded_token['admin']
         query = ServiceRequests.query
-        response = None
-        if role == "cust" or admin == '1':
-            srvcreqs = query.filter(ServiceRequests.customer_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
-            details = []
-            for srvcreq in srvcreqs:
-                srvcreq_data = {
-                    'srvcreq_id': srvcreq.srvcreq_id, 
-                    'srvc_id': srvcreq.srvc_id,
-                    'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
-                    'customer_id': srvcreq.customer_id,
-                    'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
-                    'prof_id': srvcreq.prof_id,
-                    'profname': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
-                    'date_srvcreq': srvcreq.date_srvcreq, 
-                    'date_cmpltreq': srvcreq.date_cmpltreq,
-                    'srvc_status': srvcreq.srvc_status, 
-                    'remarks': srvcreq.remarks, 
-                    'cust_rating': srvcreq.cust_rating, 
-                    # 'prof_rating': srvcreq.prof_rating, 
-                    'cust_review': srvcreq.cust_review, 
-                    # 'prof_review': srvcreq.prof_review
-                }
-                details.append(srvcreq_data)
-            response = make_response(jsonify({
-                            'message': 'Customer services fetched Successfully.',
-                            'data': details,
-                            'flag':1,
-                            'status': 'success'
-                        }), 200)
+        if flag == "0":
+            response = None
+            if role == "cust" or admin == '1':
+                srvcreqs = query.filter(ServiceRequests.customer_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
+                details = []
+                for srvcreq in srvcreqs:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'profname': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'date_srvcreq': srvcreq.date_srvcreq, 
+                        'date_cmpltreq': srvcreq.date_cmpltreq,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks, 
+                        'cust_rating': srvcreq.cust_rating, 
+                        # 'prof_rating': srvcreq.prof_rating, 
+                        'cust_review': srvcreq.cust_review, 
+                        # 'prof_review': srvcreq.prof_review
+                    }
+                    details.append(srvcreq_data)
+                response = make_response(jsonify({
+                                'message': 'Customer services fetched Successfully.',
+                                'data': details,
+                                'flag':1,
+                                'status': 'success'
+                            }), 200)
 
-        elif role == "prof" or admin == '1':
-            srvcreqs_prof = query.filter(ServiceRequests.prof_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
-            srvcreqs_cust = query.filter(ServiceRequests.customer_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
-            details_prof = []
-            details_cust = []
-            for srvcreq in srvcreqs_prof:
-                srvcreq_data = {
-                    'srvcreq_id': srvcreq.srvcreq_id, 
-                    'srvc_id': srvcreq.srvc_id,
-                    'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
-                    'customer_id': srvcreq.customer_id,
-                    'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
-                    'prof_id': srvcreq.prof_id,
-                    'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
-                    'date_srvcreq': srvcreq.date_srvcreq, 
-                    'date_cmpltreq': srvcreq.date_cmpltreq,
-                    'srvc_status': srvcreq.srvc_status, 
-                    'remarks': srvcreq.remarks, 
-                    # 'cust_rating': srvcreq.cust_rating, 
-                    'prof_rating': srvcreq.prof_rating, 
-                    # 'cust_review': srvcreq.cust_review, 
-                    'prof_review': srvcreq.prof_review
-                }
-                details_prof.append(srvcreq)
+            elif role == "prof" or admin == '1':
+                srvcreqs_prof = query.filter(ServiceRequests.prof_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
+                srvcreqs_cust = query.filter(ServiceRequests.customer_id == id).order_by(ServiceRequests.date_srvcreq.desc()).all()
+                details_prof = []
+                details_cust = []
+                for srvcreq in srvcreqs_prof:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'date_srvcreq': srvcreq.date_srvcreq, 
+                        'date_cmpltreq': srvcreq.date_cmpltreq,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks, 
+                        # 'cust_rating': srvcreq.cust_rating, 
+                        'prof_rating': srvcreq.prof_rating, 
+                        # 'cust_review': srvcreq.cust_review, 
+                        'prof_review': srvcreq.prof_review
+                    }
+                    details_prof.append(srvcreq)
 
 
-            for srvcreq in srvcreqs_cust:
-                srvcreq_data = {
-                    'srvcreq_id': srvcreq.srvcreq_id, 
-                    'srvc_id': srvcreq.srvc_id,
-                    'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
-                    'customer_id': srvcreq.customer_id,
-                    'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
-                    'prof_id': srvcreq.prof_id,
-                    'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
-                    'date_srvcreq': srvcreq.date_srvcreq, 
-                    'date_cmpltreq': srvcreq.date_cmpltreq,
-                    'srvc_status': srvcreq.srvc_status, 
-                    'remarks': srvcreq.remarks, 
-                    'cust_rating': srvcreq.cust_rating, 
-                    # 'prof_rating': srvcreq.prof_rating, 
-                    'cust_review': srvcreq.cust_review, 
-                    # 'prof_review': srvcreq.prof_review
-                }
-                details_cust.append(srvcreq)
+                for srvcreq in srvcreqs_cust:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'date_srvcreq': srvcreq.date_srvcreq, 
+                        'date_cmpltreq': srvcreq.date_cmpltreq,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks, 
+                        'cust_rating': srvcreq.cust_rating, 
+                        # 'prof_rating': srvcreq.prof_rating, 
+                        'cust_review': srvcreq.cust_review, 
+                        # 'prof_review': srvcreq.prof_review
+                    }
+                    details_cust.append(srvcreq)
 
-                
-            response = make_response(jsonify({
-                            'message': 'Professional services fetched Successfully.',
-                            'data_prof': details_prof,
-                            'data_cust': details_cust,
-                            'flag':1,
-                            'status': 'success'
-                        }), 200)
+                    
+                response = make_response(jsonify({
+                                'message': 'Professional services fetched Successfully.',
+                                'data_prof': details_prof,
+                                'data_cust': details_cust,
+                                'flag':1,
+                                'status': 'success'
+                            }), 200)
+            else:
+                response = make_response(jsonify({"message": "Unauthorized Access.","flag":0,"status":"failure"}),401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         else:
-            response = make_response(jsonify({"message": "Unauthorized Access.","flag":0,"status":"failure"}),401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+            response = None
+            if role == "cust" or admin == '1':
+                srvcreqs = query.filter((ServiceRequests.customer_id == id) & (ServiceRequests.srvc_status == "pending")).all()
+                details = []
+                for srvcreq in srvcreqs:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'profname': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks
+                    }
+                    details.append(srvcreq_data)
+                response = make_response(jsonify({
+                                'message': 'Customer pending services fetched Successfully.',
+                                'data': details,
+                                'flag':1,
+                                'status': 'success'
+                            }), 200)
+            elif role == "prof" or admin == '1':
+                srvcreqs_prof = query.filter((ServiceRequests.prof_id == id) & (ServiceRequests.srvc_status == 'pending')).all()
+                srvcreqs_cust = query.filter((ServiceRequests.customer_id == id) & (ServiceRequests.srvc_status == 'pending')).all()
+                details_prof = []
+                details_cust = []
+                for srvcreq in srvcreqs_prof:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks
+                    }
+                    details_prof.append(srvcreq)
+
+
+                for srvcreq in srvcreqs_cust:
+                    srvcreq_data = {
+                        'srvcreq_id': srvcreq.srvcreq_id, 
+                        'srvc_id': srvcreq.srvc_id,
+                        'srvc_name': srvcreq.srvc_professional.prof_service.service_name,
+                        'customer_id': srvcreq.customer_id,
+                        'customer_name':  srvcreq.srvc_usr.first_name + " " + srvcreq.srvc_usr.last_name,
+                        'prof_id': srvcreq.prof_id,
+                        'prof_name': srvcreq.srvc_professional.usr.first_name + " " + srvcreq.srvc_professional.usr.last_name,
+                        'srvc_status': srvcreq.srvc_status, 
+                        'remarks': srvcreq.remarks
+                    }
+                    details_cust.append(srvcreq)
+
+                    
+                response = make_response(jsonify({
+                                'message': 'Professional pending services fetched Successfully.',
+                                'data_prof': details_prof,
+                                'data_cust': details_cust,
+                                'flag':1,
+                                'status': 'success'
+                            }), 200)
+            else:
+                response = make_response(jsonify({"message": "Unauthorized Access.","flag":0,"status":"failure"}),401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
     
 
 
+    """
+    Handle POST request to /api/srvc_req
+    """
     @check_role_cust
     @check_loggedIn_status
     @csrf_protect
@@ -156,7 +236,14 @@ class ServiceRequestAPI(Resource):
         try:
             db.session.add(srvcreq)
             db.session.commit()
+            service = Services.query.filter_by(service_id = data['srvc_id']).first()
+            srvc_name = service.service_name if service else None
+            customer = ServiceRequests.query.filter_by(customer_id = data["customer_id"]).first()
+            fullname = customer.srvc_usr.first_name if customer else None + " " + customer.srvc_usr.last_name if customer else None
+            link = f"http://localhost:5000/api/srvc_req/{data['prof_id']}/1"
             ##########################################################################
+            #On navigating to the link below all the requests to be accepted by professional will be shown
+            server_side_event(msg = f"Service : `{srvc_name}`  request recieved from Customer : `{fullname}`" , link = link, type = f"customer_request_{data["prof_id"]}")
             response = make_response(jsonify({
                             'message': 'Order placed successfully. Waiting for professional to accept it.',
                             'data': "pending",
@@ -171,7 +258,9 @@ class ServiceRequestAPI(Resource):
         return response
 
 
-
+    """
+    Handle PUT request to /api/srvc_req
+    """
     @check_loggedIn_status
     @csrf_protect
     @check_loggedIn_jwt_expiration
