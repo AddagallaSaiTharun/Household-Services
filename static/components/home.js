@@ -1,3 +1,6 @@
+
+
+
 const Home = Vue.component("home-component", {
   template: `
   <div>

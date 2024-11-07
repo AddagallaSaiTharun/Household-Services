@@ -68,7 +68,7 @@ const prohome = Vue.component("prohome", {
     `,
   data() {
     return {
-      usernamer: localStorage.getItem("user"),
+      username: localStorage.getItem("user"),
       token: localStorage.getItem("token"),
       verified: false,
       requests: [],
@@ -148,6 +148,9 @@ const prohome = Vue.component("prohome", {
       headers: {
         Authorization: "Bearer " + this.token,
       },
+      params:{
+        self: true
+      }
     });
     const data = JSON.parse(response.data).message[0];
     if (data != null && data.prof_ver == 1) {
