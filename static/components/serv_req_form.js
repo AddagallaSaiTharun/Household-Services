@@ -16,10 +16,7 @@ const serv_req_form = Vue.component("req_form", {
             <label style="font-weight: bold;" for="from_date">From Date:</label>
             <input type="date" v-model="from_date" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;" />
           </div>
-          <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;" for="to_date">To Date:</label>
-            <input type="date" v-model="to_date" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;" />
-          </div>
+
           <div style="margin-bottom: 15px;">
             <label style="font-weight: bold;" for="remarks">Remarks:</label>
             <textarea v-model="remarks" rows="3" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
@@ -38,7 +35,6 @@ const serv_req_form = Vue.component("req_form", {
       message: "",
       error: false,
       from_date: "",
-      to_date: "",
     };
   },
   methods: {
@@ -49,7 +45,6 @@ const serv_req_form = Vue.component("req_form", {
       formData.append("prof_id", this.prof_id);
       formData.append("remarks", this.remarks);
       formData.append("date_srvcreq", this.from_date);
-      formData.append("date_cmpltreq", this.to_date);
 
       const res = await axios.post("/api/srvcreq",formData,{
         headers:{

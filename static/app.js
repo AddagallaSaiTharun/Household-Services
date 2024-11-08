@@ -12,7 +12,8 @@ import noti from "./components/notification.js";
 import user_stats from "./components/user_stats.js";
 import current_order from "./components/current_order.js";
 import serv_req_form from "./components/serv_req_form.js";
-
+import request_cards from "./components/request_cards.js";
+import otp_form from "./components/otp_form.js";
 
 
 

@@ -3,7 +3,7 @@ const navbar = Vue.component("navbar", {
   template: `
 <nav style="display: flex; justify-content: space-between">
         <div class="left">
-          <router-link class="navbar-brand" to="/">FixUpCrew</router-link>
+          <router-link class="navbar-brand" to="/"><h2>Fix-Up-Crew</h2></router-link>
         </div>
         <div class="right">
           <div style="display: flex">

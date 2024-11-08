@@ -1,6 +1,7 @@
 const admin_home = Vue.component("admin-home", {
   template: `
     <div>
+    <noti></noti>
     <h2>This is the admin page</h2>
     <button class="btn btn-primary" @click="add_service">Add_Service</button>
     <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">

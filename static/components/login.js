@@ -51,6 +51,7 @@ const Login = Vue.component("LoginComponent", {
         const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (data.token) {
           localStorage.setItem("token", data.token);
+          localStorage.setItem("email", data.email);
           localStorage.setItem("user", data.name);
           window.location.href = "/";
         } else {

@@ -4,10 +4,10 @@
 const Home = Vue.component("home-component", {
   template: `
   <div>
-      <div v-if="isPro">
+      <div v-if="isPro & !isAdmin">
         <prohome></prohome>
       </div>
-      <div v-if="isAdmin">
+      <div v-if="isAdmin & !isPro">
         <admin-home></admin-home>
       </div>
       <div v-if="!isAdmin&!isPro">
@@ -100,7 +100,7 @@ const Home = Vue.component("home-component", {
           <div class="notification-bell">
             <i class="fas fa-bell"></i>
           </div>
-          {{notification.msg}}<a href="/">view</a>
+          {{notification}}<a href="/">view</a>
         </div>
       </div>
     </div>
@@ -110,12 +110,13 @@ const Home = Vue.component("home-component", {
     return {
       username: localStorage.getItem("user"),
       token: localStorage.getItem("token"),
-      isAdmin: null,
-      isPro: null,
+      isAdmin: false,
+      isPro: false,
       services: [],
-      notification: null,
+      notification: "",
       isVisible: false,
       hideTimeout: null,
+      email: localStorage.getItem("email")
     };
   },
   watch: {
@@ -125,14 +126,16 @@ const Home = Vue.component("home-component", {
       }
     },
   },
-  async beforeCreate() {
+
+  async created() {
+    this.setupEventSource();
     try {
       const response = await axios.get("/api/isadmin", {
         headers: {
           Authorization: "Bearer " + this.token,
         },
       });
-      this.isAdmin = response.data;
+      this.isAdmin = response.data.message;
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -142,7 +145,7 @@ const Home = Vue.component("home-component", {
         Authorization: "Bearer " + this.token,
       }   
     })
-    this.isPro = pro_data.data;
+    this.isPro = pro_data.data.message;
 
     try {
       const response = await axios.get("/api/service", {
@@ -154,9 +157,6 @@ const Home = Vue.component("home-component", {
     } catch (error) {
       console.error("Error fetching service data:", error);
     }
-  },
-  async created() {
-    this.setupEventSource();
     
   },
   methods: {
@@ -166,9 +166,8 @@ const Home = Vue.component("home-component", {
     setupEventSource() {
       const source = new EventSource("http://127.0.0.1:5000/events");
 
-      source.addEventListener("user", (event) => {
-        const data = JSON.parse(event.data);
-        this.notification = data; 
+      source.addEventListener(this.email, (event) => {
+        this.notification = event.data; 
         console.log(this.notification)
       });
 

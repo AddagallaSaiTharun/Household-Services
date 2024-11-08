@@ -7,7 +7,6 @@ from application.jobs import workers
 from flask_sse import sse
 from flask_mail import Mail
 from apscheduler.schedulers.background import BackgroundScheduler
-# Initialize the Flask extensions
 
 app = None
 api = None
@@ -53,7 +52,7 @@ app, api, celery, mail = create_app()
 
 # Import resources after app is created
 from application.controller.controllers import *
-from application.api.users import UserAPI, IsAdimn, IsPro
+from application.api.users import UserAPI
 from application.api.services import ServiceAPI
 from application.api.srvcreqs import ServiceRequestAPI
 from application.api.login import UserLogin
@@ -65,8 +64,6 @@ api.add_resource(ServiceAPI, "/api/service")
 api.add_resource(ServiceRequestAPI, "/api/srvcreq")
 api.add_resource(UserLogin, "/api/login")
 api.add_resource(ProfessionalAPI, "/api/professional")
-api.add_resource(IsAdimn, "/api/isadmin")
-api.add_resource(IsPro, "/api/ispro")
 
 if __name__ == '__main__':
     # Start the application

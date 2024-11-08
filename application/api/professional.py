@@ -4,7 +4,7 @@ from application.utils.validation import preprocesjwt
 from application.data.database import db
 from application.data.models import  Professionals, Users
 import json
-from application.jobs.sse import server_side_event
+from application.jobs.sse import send_notification
 from datetime import datetime
 import redis
 from application.jobs import tasks
@@ -14,6 +14,8 @@ from application.jobs import tasks
 
 class ProfessionalAPI(Resource):
     def get(self):
+        
+
         """
         Returns professionals based on the data in the request. 
         If no data is provided, returns all professionals.
@@ -116,6 +118,9 @@ class ProfessionalAPI(Resource):
             data = dict(data)
             db.session.add(prof)
             db.session.commit()
-            
-            server_side_event({"msg" : "new request!"}) 
+            admins_emails = Users.query.filter_by(role = "admin").all()
+            emails = [a.email for a in admins_emails]
+            for email in emails:
+                data = {"msg" : "professionals are wiating for your approval!!", "email" : email}
+                send_notification(data)            
             return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201

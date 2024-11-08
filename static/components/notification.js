@@ -6,7 +6,7 @@ const noti = Vue.component("noti", {
           <div class="notification-bell">
             <i class="fas fa-bell"></i>
           </div>
-          New Professionals are waiting for verification!⌚.<a href="/">view</a>
+             {{ notification }}<a href="/">view</a>
         </div>
       </div>
     </div>
@@ -19,6 +19,8 @@ const noti = Vue.component("noti", {
       notification: null,
       isVisible: false,
       hideTimeout: null,
+      email: localStorage.getItem("email"),
+
     };
   },
   watch: {
@@ -42,10 +44,9 @@ const noti = Vue.component("noti", {
     setupEventSource() {
       const source = new EventSource("http://127.0.0.1:5000/events");
 
-      source.addEventListener("customer", (event) => {
-        const data = JSON.parse(event.data);
+      source.addEventListener(this.email, (event) => {
+        const data = event.data;
         this.notification = data; 
-        console.log(this.notification)
       });
 
 

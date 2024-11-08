@@ -11,33 +11,6 @@ from datetime import datetime
 
 bcrypt = Bcrypt(app)
 
-class IsPro(Resource):
-    def get(self):
-        """
-        Return True if the user is professional, False otherwise.
-        """
-        _, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
-        if role == "professional":
-            return True
-        else:
-            return False
-
-
-class IsAdimn(Resource):
-    def get(self):
-        """
-        Return True if the user is admin, False otherwise.
-        """
-        _, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-        if role == "admin":
-            return True
-        else:
-            return False
 
 
 
