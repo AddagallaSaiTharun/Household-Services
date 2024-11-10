@@ -321,4 +321,5 @@ class ServiceRequestAPI(Resource):
                     print("Rolling back. Issue with database Insertion",e)
                     db.session.rollback()
                     response = make_response(jsonify({"message":"Your opinion could not be saved. Database error. Please try again.",'flag':0,"status":"failure"}),503)
+        response.headers['Content-Type'] = 'application/json'
         return response    

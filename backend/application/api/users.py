@@ -1,181 +1,97 @@
 from flask_restful import Resource
-from flask import request
-from application.utils.validation import preprocesjwt
 from application.data.database import db
-from application.data.models import Users, Professionals
-import json
-from flask_bcrypt import Bcrypt
+from application.data.models import Users, Professionals , Services
+from flask import request,make_response,jsonify
+from application.utils.validation import check_loggedIn_jwt_expiration,csrf_protect,check_role_admin,check_loggedIn_status,check_role_cust
+import jwt
 from flask import current_app as app
 from datetime import datetime
-
-bcrypt = Bcrypt(app)
-
-
-class IsPro(Resource):
-    def get(self):
-        """
-        Return True if the user is professional, False otherwise.
-        """
-        _, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
-        if role == "professional":
-            return True
-        else:
-            return False
-
-
-class IsAdimn(Resource):
-    def get(self):
-        """
-        Return True if the user is admin, False otherwise.
-        """
-        _, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
-        if role == "admin":
-            return True
-        else:
-            return False
 
 
 
 
 
 class UserAPI(Resource):
+    @check_role_admin
+    @check_loggedIn_status
+    @csrf_protect
+    @check_loggedIn_jwt_expiration
     def get(self):
         """
-        Returns users based on the data in the request. 
-        If no data is provided, returns all users.
+        Returns users based(user_id) on the data in the request. 
+        If no data(user_id) is provided, returns all users.(By admin only)
         """
-        user_id, role, _, error = preprocesjwt(request)
-        if error:
-            return json.dumps({'error': 'Unauthorized access'}), 401
-
-        user_col = ["user_id", 'email', 'first_name', 'last_name', 'age', 'gender', 'role', 'user_image_url', 'password', 'phone', 'address', 'address_link', 'pincode']        
-
-        if role == "user":
-            user = Users.query.filter_by(user_id=user_id).first()
-            if user:
-                return json.dumps({"message": {'user_id': user.user_id, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, 'age': user.age, 'gender': user.gender, 'role': user.role, 'user_image_url': user.user_image_url, 'password': user.password, 'phone': user.phone, 'address': user.address, 'address_link': user.address_link, 'pincode': user.pincode}})
-            else:
-                return json.dumps({"error": "User not found"}), 404
-
-        elif role == "admin":
-            query = Users.query
-            data = request.args.to_dict()
-            if data:
-                for column in user_col:
-                    if column in data:
-                        query = query.filter(getattr(Users, column) == data[column])
+        query = Users.query
+        data = request.args.to_dict() or None
+        users = []
+        response = None
+        if data:
+            users = query.filter(Users.user_id == data["user_id"]).all()
+        else:
             users = query.all()
-            return json.dumps({"message": [{'user_id': user.user_id, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, 'age': user.age, 'gender': user.gender, 'role': user.role, 'user_image_url': user.user_image_url, 'password': user.password, 'phone': user.phone, 'address': user.address, 'address_link': user.address_link, 'pincode': user.pincode} for user in users]})
-        
-        return json.dumps({'error': 'Unauthorized access'}), 401
+        if users:
+            details = []
+            for user in users:
+                details.append({'cust_userid': user.user_id,
+                                'cust_username': user.user_name,
+                                'cust_fullname': user.first_name + user.last_name,
+                                'cust_age': user.age, 
+                                'cust_gender': user.gender, 
+                                'cust_phone': user.phone, 
+                                'cust_role': user.role,
+                                })
 
-    def put(self):
-        """
-        Updates an existing user based on the user's role.
-        """
-        user_id, role, _, error = preprocesjwt(request)
-        if error or role=="professional":
-            return json.dumps({'error': 'Unauthorized access'}), 401
+            response = make_response(jsonify({
+                "message": "Customers details fetched successfully.",
+                "data":details,
+                "flag" :1,
+                "status": "success",
+            }),200)
+        else:
+            response = make_response(jsonify({
+                "message": "No customers found",
+                "data":details,
+                "flag" :1,
+                "status": "success",
+            }),200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
-        data = request.get_json()
+ 
+class ServicesListAPI(Resource):
+    @check_role_cust
+    @check_loggedIn_status
+    @csrf_protect
+    @check_loggedIn_jwt_expiration
+    def get(self):
+        servicesList = dict()
+        services = Services.query.all()
+        for service in services:
+            professionals = service.professional_opted
+            details = []
+            for professional in professionals:
+                sum_rating = 0
+                count = 0
+                for srvc_req in professional.srvc_reqs:
+                    if srvc_req.cust_rating != None:
+                        sum_rating += srvc_req.cust_rating
+                        count += 1
+                details.append({"service_image" : service.service_image,
+                                "service_base_price" : service.service_base_price,
+                                "prof_userid" : professional.prof_userid,
+                                "prof_name" : professional.usr.first_name + professional.usr.last_name,
+                                "prof_gender" : professional.usr.gender,
+                                "prof_age" : professional.age,
+                                "prof_exp" : professional.prof_exp,
+                                "prof_join_date" : professional.prof_join_date,
+                                "service_reqs_completed" : len(professional.srvc_reqs),
+                                "avg_rating" : sum_rating/count if count != 0 else 0,
+                                })
+            servicesList[service.sercice_name] = details
+        response = make_response(jsonify({"message" : "All services by professional fetched successfully.",
+                                         "data" : servicesList,
+                                         "flag" : 1,
+                                         "status" : "success"}),200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
-        if role == "user":
-            user = Users.query.filter_by(user_id=user_id).first()
-            if not user:
-                return json.dumps({"error": f"{user_id} not found "}), 400
-            user_col = ["email", "first_name", "last_name", "age", "gender", "user_image_url", "password", "phone", "address", "address_link", "pincode"]
-            for col in user_col:
-                if col in data:
-                    setattr(user, col, data[col])
-            db.session.commit()
-            return json.dumps({'message': 'User updated successfully'}), 200
-        elif role == "admin":
-            if data["role"] == "user":
-                user = Users.query.filter_by(user_id=data["user_id"]).first()
-                if not user:
-                    return json.dumps({"error": f"{data['user_id']} not found "}), 400
-                for col in user_col:
-                    if col in data:
-                        setattr(user, col, data[col])
-                db.session.commit()
-                return json.dumps({'message': 'User updated successfully'}), 200
-            if data["role"] == "professional":
-                user = Users.query.filter_by(user_id=user_id).join(Professionals, Users.user_id == Professionals.prof_userid).first()
-                if not user:
-                    return json.dumps({"error": f"{user_id} not found "}), 400
-                prof_col = ["prof_userid", "prof_exp", "prof_dscp", "prof_srvcid", "prof_ver", "prof_join_date"]
-                for col in prof_col:
-                    if col in data:
-                        setattr(user.usr_professional, col, data[col])
-                return json.dumps({'message': 'Professional updated successfully'}), 200
-        
-        return json.dumps({'error': 'Unauthorized access'}), 401
-
-    # def delete(self):
-    #     """
-    #     Deletes a service.
-    #     """
-    #     user_id, role, _, error = preprocesjwt(request)
-    #     if error:
-    #         return  json.dumps({'error': 'Unauthorized access'}), 401
-    #     if role=="user":
-    #         user = Users.query.filter(Users.user_id == user_id).first()
-    #         if not user:
-    #             return  json.dumps({"error": f"{user_id} not found "}),400
-    #         user.role = "blocked"
-    #         db.session.commit()
-    #         return  json.dumps({'message': 'User blocked successfully'}), 200
-    #     if role=="professional":
-    #         user = Users.query.filter(Users.user_id == user_id).usr_professional.first()
-    #         if not user:
-    #             return  json.dumps({"error": f"{user_id} not found "}),400
-    #         user.role = "user"
-    #         db.session.commit()
-    #         return  json.dumps({'message': 'Professional blocked successfully'}), 200
-    #     if role=="admin":
-    #         data = request.get_json()
-    #         if "role" not in data or "user_id" not in data:
-    #             return  json.dumps({'error': 'Invalid request'}), 400
-    #         user = Users.query.filter(Users.user_id == data["user_id"]).first()
-    #         if data['role'] == "professional":
-    #             user.role = "user"
-    #         elif data["role"] == "user":
-    #             user.role = "blocked"
-    #         db.session.commit()
-    #     return  json.dumps({'error': 'Unauthorized access'}), 401
-
-    def post(self):
-        """
-        Creates a new user.
-        """        
-        data = request.get_json()
-        required_fields = ["email", "first_name", "password", "phone", "address", "pincode"]
-        if not all(field in data for field in required_fields):
-            missing_fields = [field for field in required_fields if field not in data]
-            return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-        if Users.query.filter_by(email=data["email"]).first():
-            return json.dumps({"error": "User with this email already exists"}), 400
-        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-        user = Users(
-            email=data['email'],
-            first_name=data['first_name'],
-            last_name=data.get('last_name'),
-            age=data.get('age'),
-            gender=data.get('gender'),
-            role = "user",
-            user_image_url=data.get('user_image_url'),
-            password=hashed_password,
-            phone=data['phone'],
-            address=data['address'],
-            address_link=data.get('address_link'),
-            pincode=data['pincode']
-        )
-        db.session.add(user)
-        db.session.commit()
-        return json.dumps({"message": "success", "email": user.email}), 201  

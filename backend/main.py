@@ -61,16 +61,16 @@ app, api, mail, clry ,bcrypt = create_app()
 
 from application.controller.controllers import *
 
-# from application.api.users import UserAPI, IsAdimn, IsPro
+from application.api.users import UserAPI, ServicesListAPI
 from application.api.services import ServiceAPI
 from application.api.logout import LogoutAPI
 from application.api.register import RegisterAPI
 from application.controller.controllers import HomePage
 from application.api.servicereq import ServiceRequestAPI
 from application.api.signin import SigninAPI,GoogleOAuthAPI,GoogleOAuthCallbackAPI,SignUpDetailsOAuthAPI
-# from application.api.professional import ProfessionalAPI
+from application.api.professional import ProfessionalAPI
 
-# api.add_resource(UserAPI,"/api/user")
+api.add_resource(UserAPI,"/api/user")
 api.add_resource(ServiceAPI,"/api/service")
 api.add_resource(SigninAPI,"/api/signin")  
 api.add_resource(GoogleOAuthAPI,"/api/signin_google")
@@ -80,7 +80,8 @@ api.add_resource(LogoutAPI,"/api/logout")
 api.add_resource(RegisterAPI,"/api/register")
 api.add_resource(HomePage, '/', '/index')
 api.add_resource(ServiceRequestAPI,'/api/srvc_req/<string:id>/<string:flag>','/api/srvc_req')
-# API.add_resource(ProfessionalAPI,"/api/professional")
+api.add_resource(ProfessionalAPI,"/api/professional")
+api.add_resource(ServicesListAPI,"/api/user/serviceslist")
 # API.add_resource(IsAdimn,"/api/isadmin") 
 # API.add_resource(IsPro,"/api/ispro") 
 

@@ -21,7 +21,7 @@ class Professionals(db.Model):  #Many   #One (One : Professionals , One : Users)
     prof_dscp=db.Column(db.String)
     prof_srvcid = db.Column(db.String, db.ForeignKey('services.service_id'),nullable=False)
     prof_ver = db.Column(db.Integer,server_default =  db.text('0')) #Verified
-    prof_join_date =db.Column(db.Date,nullable=False)  #Default YYYY-MM-DD
+    prof_join_date =db.Column(db.Date)  #Default YYYY-MM-DD
     srvc_reqs = db.relationship('ServiceRequests',backref="srvc_professional",lazy=True)
     usr = db.relationship('Users', uselist=False ,backref="usr_professional",lazy=True)
 

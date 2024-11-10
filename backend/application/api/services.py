@@ -16,21 +16,16 @@ class ServiceAPI(Resource):
     def get(self):
         # /api/services
         """
-        Returns services based on the data in the request.
-        If no data is provided, returns all services.
+        Returns a service based on the data(service_id) in the request.
+        If no data(service_id) is provided, returns all services.
         """
         query = Services.query
-        
-        filter_args = {
-            column: request.args.get(column)
-            for column in ["service_id", "service_name", "time_req", "service_base_price", "service_image", "service_dscp"]
-            if request.args.get(column) is not None
-        }
-
-        if filter_args:
-            query = query.filter_by(**filter_args)
-
-        services = query.all()
+        data = request.args.to_dict() or None
+        services = []
+        if data:
+            services = query.filter_by(service_id = data['service_id']).all()
+        else:
+            services = query.all()
         result = []
         for service in services:
             # Create response content
@@ -42,7 +37,7 @@ class ServiceAPI(Resource):
                 'service_image': "data:image/png;base64,"+decodeutf8(service.service_image),
                 'service_dscp': service.service_dscp
             })
-        response = make_response(jsonify({"content": result,"status":"success","flag":1}),200)
+        response = make_response(jsonify({"message":"Services retrieval successful.","data": result,"status":"success","flag":1}),200)
         response.headers['Content-Type'] = 'application/json'
         return response
     
@@ -53,7 +48,7 @@ class ServiceAPI(Resource):
     @check_loggedIn_jwt_expiration
     def put(self):
         """
-        Updates an existing service.
+        Updates an existing service.(By admin only)
         """
         query = Services.query
         data = request.form
@@ -89,7 +84,7 @@ class ServiceAPI(Resource):
     @check_loggedIn_jwt_expiration
     def delete(self):
         """
-        Deletes a service.
+        Deletes a service by service_name param in request.(By admin only)
         """
         service_name = request.agrs.get("service_name")
         response = None
@@ -123,7 +118,7 @@ class ServiceAPI(Resource):
     @check_loggedIn_jwt_expiration
     def post(self):
         """
-        Creates a new service.
+        Creates a new service.(By admin only)
         """
 
         query = Services.query
