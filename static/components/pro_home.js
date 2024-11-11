@@ -6,19 +6,19 @@ const prohome = Vue.component("prohome", {
     <div>
       <div v-if="verified">
         <div
-          class="user_stats"
-          style="display: flex; justify-content: space-around; margin-top: 10px"
+          style="display: flex; margin-top: 10px; justify-content: space-evenly;"
         >
-          <div class="user_stats" style="width: 100%">
+          <div style="width: 40%; padding:40px">
             <user_stats></user_stats>
           </div>
-        </div>
-        <div v-if="engaged">
-          <current_order :current_order="current_order" :engaged="engaged" @toggleengaged="toggleengaged"></current_order>
+          <div v-if="engaged">
+          <current_order style="width: 60%" :current_order="current_order" :engaged="engaged" @toggleengaged="toggleengaged"></current_order>
         </div>
         <div v-else>
-          <request_cards></request_cards>
+          <request_cards  style="width: 60%"></request_cards>
         </div>
+        </div>
+        
         <div v-if="notification" :class="['notification', { show: isVisible }]">
           <div class="notification-bell">
             <i class="fas fa-bell"></i>

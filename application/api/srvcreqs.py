@@ -32,7 +32,7 @@ class ServiceRequestAPI(Resource):
         if role == "user":
             query = query.filter(ServiceRequests.customer_id == user_id)
         elif role == "professional":
-            query = query.filter(ServiceRequests.prof_id == user_id, ServiceRequests.srvc_status!="rejected")
+            query = query.filter(ServiceRequests.prof_id == user_id)
         for column in [
             "srvcreq_id", "srvc_id", "customer_id", "prof_id", 
             "date_srvcreq", "date_cmpltreq", "srvc_status", 
