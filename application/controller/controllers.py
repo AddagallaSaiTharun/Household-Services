@@ -136,6 +136,8 @@ def sendOtp():
     return json.dumps({"success": True, "message": "OTP sent successfully"})
 
 
+
+
 @app.route('/api/verifyotp', methods=['POST'])
 def verify_otp():
     _, _, _, error = preprocesjwt(request)

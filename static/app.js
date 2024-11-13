@@ -14,7 +14,7 @@ import current_order from "./components/current_order.js";
 import serv_req_form from "./components/serv_req_form.js";
 import request_cards from "./components/request_cards.js";
 import otp_form from "./components/otp_form.js";
-
+import rating_form from "./components/rating_form.js";
 
 
 

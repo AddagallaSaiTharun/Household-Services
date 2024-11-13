@@ -6,18 +6,17 @@ const prohome = Vue.component("prohome", {
     <div>
       <div v-if="verified">
         <div
-          class="user_stats"
-          style="display: flex; justify-content: space-around; margin-top: 10px"
+          style="display: flex; margin-top: 10px; justify-content: space-evenly;"
         >
-          <div class="user_stats" style="width: 100%">
+          <div style="width: 40%; padding:40px">
             <user_stats></user_stats>
           </div>
+          <div v-if="engaged" style="width: 60%">
+          <current_order  :current_order="current_order" :engaged="engaged" @toggleengaged="toggleengaged"></current_order>
         </div>
-        <div v-if="engaged">
-          <current_order :current_order="current_order" :engaged="engaged" @toggleengaged="toggleengaged"></current_order>
+        <div v-else style="width: 60%; back-ground-color: white">
+          <request_cards ></request_cards>
         </div>
-        <div v-else>
-          <request_cards></request_cards>
         </div>
         <div v-if="notification" :class="['notification', { show: isVisible }]">
           <div class="notification-bell">
@@ -26,7 +25,6 @@ const prohome = Vue.component("prohome", {
           {{notification}}<a href="/">view</a>
         </div>
       </div>
-
       <div v-else>
         <h2>You are not verified please wait until the Admin verifies you</h2>
       </div>

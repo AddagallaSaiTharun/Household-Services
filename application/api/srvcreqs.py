@@ -7,7 +7,7 @@ from application.data.database import db
 from application.data.models import ServiceRequests, Users
 from application.jobs.sse import send_notification
 
-
+from datetime import date
 
 
 
@@ -32,7 +32,7 @@ class ServiceRequestAPI(Resource):
         if role == "user":
             query = query.filter(ServiceRequests.customer_id == user_id)
         elif role == "professional":
-            query = query.filter(ServiceRequests.prof_id == user_id, ServiceRequests.srvc_status!="rejected")
+            query = query.filter(ServiceRequests.prof_id == user_id)
         for column in [
             "srvcreq_id", "srvc_id", "customer_id", "prof_id", 
             "date_srvcreq", "date_cmpltreq", "srvc_status", 
@@ -189,10 +189,11 @@ class ServiceRequestAPI(Resource):
         if not srvcreq:
             return json.dumps({"error": f"{data['srvcreq_id']} not found "}), 400
         if role in ("user", "admin"):
-            if "cust_rating" in data:
-                srvcreq.cust_rating = data["cust_rating"]
-            if "cust_review" in data:
-                srvcreq.cust_review = data["cust_review"]
+            if "rating" in data:
+                srvcreq.prof_rating = data["rating"]
+            if "review" in data:
+                srvcreq.prof_review = data["review"]
+
             if data['srvc_status'] == "canceled" and srvcreq.srvc_status == "pending":
                 srvcreq.srvc_status = data['srvc_status']
                 data = {"msg" : f"You have cancelled your request!! Retry again!", "email" : user_email}
@@ -200,10 +201,10 @@ class ServiceRequestAPI(Resource):
             
 
         if role in ("professional", "admin"):
-            if "prof_rating" in data:
-                srvcreq.prof_rating = data["prof_rating"]
-            if "prof_review" in data:
-                srvcreq.prof_review = data["prof_review"]
+            if "rating" in data:
+                srvcreq.cust_rating = data["rating"]
+            if "review" in data:
+                srvcreq.cust_review = data["review"]
             if "srvc_status" in data:
                 if data['srvc_status'] in ("accepted","rejected") and srvcreq.srvc_status == "pending":
                     srvcreq.srvc_status = data['srvc_status']
@@ -211,9 +212,10 @@ class ServiceRequestAPI(Resource):
                     send_notification(d)
                 if data['srvc_status'] == "completed" and srvcreq.srvc_status == "accepted":
                     srvcreq.srvc_status = data['srvc_status']
+                    srvcreq.date_cmpltreq = date.today()
                     d = {"msg" : f"Your task has been complete. Please rate the service!!🎉🎉", "email" : user_email}
                     send_notification(d)
-                    d = {"msg" : f"Your task has been complete. Please rate the customer!!🎉🎉", "email" : pro_email}
+                    d = {"msg" : f"Your task has been complete. Please rate the customer!!🎉🎉", "email" : pro_email, "show_review_form" : True}
                     send_notification(d)
   
         db.session.commit()
