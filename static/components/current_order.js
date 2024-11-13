@@ -165,6 +165,7 @@ const current_order = Vue.component("current_order", {
       token: localStorage.getItem("token"),
       user: localStorage.getItem("user"),
       showForm: false,
+      showratingForm: false
     };
   },
   created() {},
@@ -190,6 +191,7 @@ const current_order = Vue.component("current_order", {
         }
       );
     },
+    
   },
 });
 

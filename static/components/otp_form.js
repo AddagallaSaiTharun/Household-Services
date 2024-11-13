@@ -1,7 +1,7 @@
 const otp_form = Vue.component("otp_form", {
   props: ["service_id", "engaged"],
   name: "otp_form",
-  template: `
+  template: `<div>
         <div style="background-color: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
           <h2 style="margin-bottom: 15px; font-size: 24px; color: #333;">Create Service Request</h2>
           <form @submit.prevent="submitForm">
@@ -14,6 +14,24 @@ const otp_form = Vue.component("otp_form", {
             <div v-if="message" :style="{color: error ? 'red' : 'green', fontSize: '14px', marginTop: '10px'}">{{ message }}</div>
           </form>
         </div>
+        <!-- Popup Overlay -->
+      <div
+        v-if="showratingForm"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <rating_form :srvc_req_id="service_id" :showratingForm="showratingForm"></rating_form>
+      </div>
+      </div>
       `,
   data() {
     return {
@@ -21,9 +39,14 @@ const otp_form = Vue.component("otp_form", {
       token: localStorage.getItem("token"),
       error: false,
       otp: null,
+      showratingForm: false,
     };
   },
   methods: {
+    close_review(value) {
+      this.showratingForm = value;
+      this.$emit("toggleengaged", !this.engaged);
+    },
     async submitForm() {
       const res = await axios.post(
         "/api/verifyotp",
@@ -38,8 +61,7 @@ const otp_form = Vue.component("otp_form", {
         }
       );
       if (res.status === 200) {
-        alert("completed_order");
-        this.$emit("toggleengaged", !this.engaged);
+        this.showratingForm = true;
       }
     },
   },

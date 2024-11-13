@@ -20,7 +20,8 @@ const user_stats = Vue.component("user_stats", {
               "
             >
             <div class="user_stats1">
-              Rejected
+            <center>Rejected</center>
+              
             </div>
 
               <div class="user_stats">{{ rejected }}</div>
@@ -37,7 +38,8 @@ const user_stats = Vue.component("user_stats", {
               "
             >
               <div class="user_stats1">
-                Completed
+              <center>Completed</center>
+                
               </div>
               <div class="user_stats">{{  completed }}</div>
             </div>
@@ -55,7 +57,8 @@ const user_stats = Vue.component("user_stats", {
             >
             
               <div class="user_stats1">
-                total requests
+                <center>total requests</center>
+                
               </div>
               <div class="user_stats">
                 {{ total }}

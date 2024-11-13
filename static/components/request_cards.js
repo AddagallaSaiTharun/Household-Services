@@ -1,6 +1,6 @@
 const request_cards = Vue.component("request_cards", {
   template: `
-    <div class="customer_requests" style="width: 100%;">
+    <div class="customer_requests">
       <div style="font-size: 30px">Requests</div>
       <div
         v-if="requests.length "

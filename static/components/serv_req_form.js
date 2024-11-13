@@ -1,7 +1,7 @@
 const serv_req_form = Vue.component("req_form", {
   name: "serv_req_form",
   template: `
-      <div style="background-color: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
+      <div style="background-color: white; padding: 20px; border-radius: 10px; width: 3in; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
         <h2 style="margin-bottom: 15px; font-size: 24px; color: #333;">Create Service Request</h2>
         <form @submit.prevent="submitForm">
           <div style="margin-bottom: 15px;">
