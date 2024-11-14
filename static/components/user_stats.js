@@ -1,75 +1,88 @@
 const user_stats = Vue.component("user_stats", {
   template: `
-    <div
+
+  <div
       style="
         background-color: white;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.356);
-        height:100%
+        padding: 30px;
+        text-align: center;
+        width: 300px;
+        height: max-content;
       "
     >
-      <div style="font-size: 30px; margin: 0 0 0 30px">Your Stats</div>
-      <div style="margin: 0.6in;padding-bottom: 0.6in;">
-        <div class="stat_container">
-          <div>
-            <div
-              style="
-                height: 1in;
-                background-color: rgba(255, 0, 0, 0.185);
-                position: relative;
-              "
-            >
-            <div class="user_stats1">
-            <center>Rejected</center>
-              
-            </div>
+      <h2 style="font-size: 24px; color: #333; margin-bottom: 20px">
+        Your Stats
+      </h2>
 
-              <div class="user_stats">{{ rejected }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="stat_container">
-          <div>
-            <div
-              style="
-                height: 1in;
-                background-color: rgba(0, 0, 0, 0.103);
-                position: relative;
-              "
-            >
-              <div class="user_stats1">
-              <center>Completed</center>
-                
-              </div>
-              <div class="user_stats">{{  completed }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="stat_container">
-          <div>
-            <div
-              style="
-                height: 1in;
-                background-color: rgba(0, 255, 13, 0.24);
-                position: relative;
-                align-items: center;
-              "
-            >
-            
-              <div class="user_stats1">
-                <center>total requests</center>
-                
-              </div>
-              <div class="user_stats">
-                {{ total }}
-      
-              </div>
-              <p></p>
-            </div>
+      <div :style="conicStyle">
+        <!-- Center hollow effect -->
+        <div
+          style="
+            width: 120px;
+            height: 120px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <div style="font-size: 18px; color: #333">Total</div>
+          <div style="font-size: 24px; font-weight: bold; color: #4caf50">
+            {{ total }}
           </div>
         </div>
       </div>
+
+      <div style="margin-top: 20px; text-align: left">
+        <div style="display: flex; align-items: center; margin-bottom: 10px">
+          <span
+            style="
+              width: 12px;
+              height: 12px;
+              background-color: rgba(255, 0, 0, 0.6);
+              display: inline-block;
+              margin-right: 8px;
+              border-radius: 2px;
+            "
+          ></span>
+          <span>Rejected: {{ rejected }}</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px">
+          <span
+            style="
+              width: 12px;
+              height: 12px;
+              background-color: rgba(0, 255, 13, 0.6);
+              display: inline-block;
+              margin-right: 8px;
+              border-radius: 2px;
+            "
+          ></span>
+          <span>Completed: {{ completed }}</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px">
+          <span
+            style="
+              width: 12px;
+              height: 12px;
+              background-color: rgba(0, 0, 0, 0.2);
+              display: inline-block;
+              margin-right: 8px;
+              border-radius: 2px;
+            "
+          ></span>
+          <span>Pending: {{ total - rejected - completed }}</span>
+        </div>
+      </div>
     </div>
+
+
+
     
     `,
   data() {
@@ -97,6 +110,29 @@ const user_stats = Vue.component("user_stats", {
         this.completed +=1;
       }
     }
+  },
+  computed: {
+    conicStyle() {
+      const totalRequests = this.total;
+      const rejectedPercentage = (this.rejected / totalRequests) * 100;
+      const completedPercentage = (this.completed / totalRequests) * 100;
+      const pendingPercentage = 100 - rejectedPercentage - completedPercentage;
+  
+      return {
+        width: '200px',
+        height: '200px',
+        borderRadius: '50%',
+        background: `conic-gradient(
+          rgba(255, 0, 0, 0.6) 0% ${rejectedPercentage}%,
+          rgba(0, 255, 13, 0.6) ${rejectedPercentage}% ${rejectedPercentage + completedPercentage}%,
+          rgba(0, 0, 0, 0.2) ${rejectedPercentage + completedPercentage}% 100%
+        )`,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+      };
+    },
   },
 });
 
