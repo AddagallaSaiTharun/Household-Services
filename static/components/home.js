@@ -103,9 +103,11 @@ const Home = Vue.component("home-component", {
           {{notification}}<a href="/">view</a>
         </div>
       </div>
+      
     </div>
 
   `,
+
   data() {
     return {
       username: localStorage.getItem("user"),
@@ -116,7 +118,7 @@ const Home = Vue.component("home-component", {
       notification: "",
       isVisible: false,
       hideTimeout: null,
-      email: localStorage.getItem("email")
+      email: localStorage.getItem("email"),
     };
   },
   watch: {
@@ -167,10 +169,12 @@ const Home = Vue.component("home-component", {
       const source = new EventSource("http://127.0.0.1:5000/events");
 
       source.addEventListener(this.email, (event) => {
+        if(event.data == true){
+            show_review_form = true;
+        }
         this.notification = event.data; 
         console.log(this.notification)
       });
-
 
       source.addEventListener("error", (event) => {
         console.error("EventSource error:", event);
