@@ -9,6 +9,7 @@ class Services(db.Model): #One (One : Service , Many : Professionals)
     service_image=db.Column(db.BLOB) #profile Image
     service_dscp = db.Column(db.String) #Description
     service_base_price = db.Column(db.Float,nullable=False)
+    category = db.Column(db.String)
     professionals_opted = db.relationship('Professionals',backref='prof_service',lazy=True)
 
 
