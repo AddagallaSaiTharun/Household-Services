@@ -1,4 +1,5 @@
 const request_cards = Vue.component("request_cards", {
+  props: ["current"],
   template: `
   <div
       class="customer_requests"

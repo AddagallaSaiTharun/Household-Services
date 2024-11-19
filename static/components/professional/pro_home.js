@@ -1,6 +1,7 @@
 import user_stats from "./user_stats.js";
 import current_order from "./current_order.js";
 
+
 const prohome = Vue.component("prohome", {
   template: `
     <div style="font-family: Arial, sans-serif; padding: 20px">
@@ -13,20 +14,7 @@ const prohome = Vue.component("prohome", {
             align-items: flex-start;
           "
         >
-          <!-- User Stats Section -->
-          <div
-            style="
-              width: 25%;
-              padding: 20px;
-              background-color: #f9f9f9;
-              border-radius: 10px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            "
-          >
-            <center>
-              <user_stats></user_stats>
-            </center>
-          </div>
+          
 
           <!-- Current Order or Request Cards Section -->
           <div
@@ -40,7 +28,7 @@ const prohome = Vue.component("prohome", {
             "
           >
             <current_order
-              :current_order="current_order"
+              :current_order="current_orders"
               :engaged="engaged"
               @toggleengaged="toggleengaged"
             ></current_order>
@@ -55,62 +43,35 @@ const prohome = Vue.component("prohome", {
               box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             "
           >
-            <request_cards></request_cards>
+            <request_cards :current="current_orders"></request_cards>
           </div>
-
-          <!-- Welcome & Activity Section -->
           <div
-            v-if="engaged"
+            v-if="!engaged"
             style="
               width: 25%;
               padding: 20px;
-              background-color: #f7f8fc;
+              background-color: #f9f9f9;
               border-radius: 10px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              text-align: center;
-              display: flex;
-              flex-direction: column;
-              gap: 15px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             "
           >
-            <h2 style="color: #333; font-size: 24px">Welcome Back!</h2>
-            <p style="font-size: 14px; color: #555">
-              "Strive not to be a success, but rather to be of value." – Albert
-              Einstein
-            </p>
-
-            <hr
-              style="border: none; border-top: 1px solid #ddd; margin: 10px 0"
-            />
-
-            <div style="text-align: left">
-              <h3 style="color: #333; font-size: 16px">Recent Activity</h3>
-              <ul
-                style="
-                  list-style-type: none;
-                  padding: 0;
-                  color: #555;
-                  font-size: 14px;
-                "
-              >
-                <li>✅ Completed 3 orders this week</li>
-                <li>🚀 5 new requests in the last 24 hours</li>
-                <li>⭐ 98% positive feedback rating</li>
-              </ul>
-            </div>
-
-            <hr
-              style="border: none; border-top: 1px solid #ddd; margin: 10px 0"
-            />
-
-            <p style="font-size: 14px; color: #007bff; cursor: pointer">
-              <a href="/tips" style="text-decoration: none; color: #007bff">
-                Explore Tips for Improving Your Workflow →
-              </a>
-            </p>
+            <center>
+              <user_stats></user_stats>
+            </center>
           </div>
+          <div
+              v-if="engaged"
+              style="
+              width: 75%;
+              background-color: #fff;
+              border-radius: 10px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+              
+            "
+          >
+            <request_cards :current="current_orders"></request_cards>
+          </div>          
         </div>
-
         <!-- Notification Section -->
         <div
           v-if="notification"
@@ -170,8 +131,8 @@ const prohome = Vue.component("prohome", {
       isVisible: false,
       hideTimeout: null,
       email: localStorage.getItem("email"),
-      engaged:false,
-      current_order:null,
+      engaged: false,
+      current_orders: [],
     };
   },
 
@@ -183,7 +144,7 @@ const prohome = Vue.component("prohome", {
     },
   },
   methods: {
-    toggleengaged(value){
+    toggleengaged(value) {
       this.engaged = value;
     },
     setupEventSource() {
@@ -229,19 +190,23 @@ const prohome = Vue.component("prohome", {
       this.verified = true;
     }
 
-    const engaged = await axios.get("/api/srvcreq",{
+    const engaged = await axios.get("/api/srvcreq", {
       headers: {
         Authorization: "Bearer " + this.token,
       },
       params: {
-        srvc_status : "accepted"
+        srvc_status: "accepted",
       },
-    })
-    
-    if(JSON.parse(engaged.data).message.length){
+    });
+    console.log(JSON.parse(engaged.data).message)
+
+    if (JSON.parse(engaged.data).message.length) {
       this.engaged = !this.engaged;
     }
-    this.current_order = JSON.parse(engaged.data).message[0];
+    for(const i of JSON.parse(engaged.data).message){
+      this.current_orders.push(i);
+    }
+    this.current_orders.sort((a,b) => new Date(a.date_srvcreq) - new Date(b.date_srvcreq));
   },
 });
 

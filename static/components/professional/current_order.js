@@ -30,13 +30,14 @@ const current_order = Vue.component("current_order", {
         
         <div>
           <h2 style="font-size: 24px; color: #333; margin: 0;">
-            {{current_order.first_name}} {{current_order.last_name}}
+            {{current_order[0].first_name}} {{current_order[0].last_name}}
           </h2>
           <h3 style="font-size: 16px; color: #777; margin-top: 5px;">
-            {{current_order.first_name}} {{current_order.last_name}}
+            {{current_order[0].first_name}} {{current_order[0].last_name}}
           </h3>
         </div>
       </div>
+
 
       <div style="margin-top: 20px;">
         <div
@@ -57,8 +58,8 @@ const current_order = Vue.component("current_order", {
                   alt="Order Icon"
                 />
               </div>
-              <div class="name" style="flex: 1; font-weight: bold;">Order:</div>
-              <div class="value" style="color: #555;">Ro repair</div>
+              <div class="name" style="flex: 1; font-weight: bold;">Order ID:</div>
+              <div class="value" style="color: #555;">{{current_order[0].srvcreq_id}}</div>
             </div>
 
             <div class="detailcontainer" style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -70,7 +71,7 @@ const current_order = Vue.component("current_order", {
                 />
               </div>
               <div class="name" style="flex: 1; font-weight: bold;">Date:</div>
-              <div class="value" style="color: #555;">2024-1-1</div>
+              <div class="value" style="color: #555;">{{current_order[0].date_srvcreq}}</div>
             </div>
 
             <div class="detailcontainer" style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -82,7 +83,7 @@ const current_order = Vue.component("current_order", {
                 />
               </div>
               <div class="name" style="flex: 1; font-weight: bold;">Location:</div>
-              <div class="value" style="color: #555;">{{current_order.address}}</div>
+              <div class="value" style="color: #555;">{{current_order[0].address}}</div>
             </div>
 
             <div class="detailcontainer" style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -94,7 +95,7 @@ const current_order = Vue.component("current_order", {
                 />
               </div>
               <div class="name" style="flex: 1; font-weight: bold;">Pincode:</div>
-              <div class="value" style="color: #555;">{{current_order.pincode}}</div>
+              <div class="value" style="color: #555;">{{current_order[0].pincode}}</div>
             </div>
 
             <div class="detailcontainer" style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -120,7 +121,7 @@ const current_order = Vue.component("current_order", {
                 />
               </div>
               <div class="name" style="flex: 1; font-weight: bold;">Remarks:</div>
-              <div class="value" style="color: #555;">{{current_order.remarks}}</div>
+              <div class="value" style="color: #555;">{{current_order[0].remarks}}</div>
             </div>
           </div>
         </div>
@@ -141,7 +142,7 @@ const current_order = Vue.component("current_order", {
             transition: background-color 0.3s ease;
           "
           id="complete-button"
-          @click="complete(current_order.srvcreq_id)"
+          @click="complete(current_order[0].srvcreq_id)"
         >
           Complete
         </button>
@@ -167,7 +168,7 @@ const current_order = Vue.component("current_order", {
   >
     <otp_form
       :engaged="engaged"
-      :service_id="current_order.srvcreq_id"
+      :service_id="current_order[0].srvcreq_id"
       @toggleengaged="toggleengaged"
       @close="closeForm"
     ></otp_form>
@@ -183,7 +184,9 @@ const current_order = Vue.component("current_order", {
       showratingForm: false
     };
   },
-  created() {},
+  created() {
+    console.log(this.current_order)
+  },
   
   methods: {
     closeForm() {
