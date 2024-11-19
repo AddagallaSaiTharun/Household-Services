@@ -198,7 +198,6 @@ const prohome = Vue.component("prohome", {
         srvc_status: "accepted",
       },
     });
-    console.log(JSON.parse(engaged.data).message)
 
     if (JSON.parse(engaged.data).message.length) {
       this.engaged = !this.engaged;

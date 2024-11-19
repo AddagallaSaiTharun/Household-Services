@@ -15,7 +15,7 @@ import serv_req_form from "./components/users/serv_req_form.js";
 import request_cards from "./components/professional/request_cards.js";
 import otp_form from "./components/professional/otp_form.js";
 import rating_form from "./components/professional/rating_form.js";
-
+import pro_profile from "./components/professional/pro_profile.js";
 
 
 const routes = [
@@ -25,6 +25,7 @@ const routes = [
   { path: "/add_service", component: add_service },
   { path: "/service/:id", component: service },
   { path: "/register_pro", component: register_pro },
+  { path: "/proprofile", component: pro_profile}
 ];
 
 const router = new VueRouter({

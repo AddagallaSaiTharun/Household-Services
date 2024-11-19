@@ -30,7 +30,9 @@ const navbar = Vue.component("navbar", {
             <!-- Dropdown Menu -->
             <div id="dropdownMenu" style="display: none; position: absolute; top: 35px; right: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); padding: 10px; width: 150px; color: #333;">
               <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px;" href="#">{{ user }}</a>
-              <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px;" href="#">Settings</a>
+              <router-link to="/proprofile" style="text-decoration: none; color: black; font-size: 14px; padding: 8px 10px;" @mouseover="hoverLink($event)" @mouseleave="leaveLink($event)">
+                Profile
+              </router-link>
               <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px; cursor: pointer;" @click="logout">Logout</a>
               
               <div v-if="!isAdmin">
