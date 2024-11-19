@@ -7,25 +7,13 @@ import json
 from flask_bcrypt import Bcrypt
 from flask import current_app as app
 import jwt
-from application.utils.validation import server_side_event
 from application.jobs import tasks
-
-
+from application.jobs.sse import send_notification
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 bcrypt = Bcrypt(app)
 
 class UserLogin(Resource):
-    def get(self):
-        email = "varun.merugu1212@gmail.com"
-        subject = "Registration"
-        body = f"""
-            <p><b>Welcome to Household Services.</b></p>
-            <p>Login into the website with the registered username and password</p>
-            <p>Looking forward to serve you :)</p>
-            <p><b>Thank you for registering!</b></p>
-        """
-        # Call the Celery task
-        job = tasks.send_registration_email.delay(email, subject, body)
-        return "hell0"
     def post(self):
         """
         Logs in user with credentials from request body (JSON)
@@ -43,13 +31,22 @@ class UserLogin(Resource):
                 'name': user.first_name,
                 'address': user.address,
                 'address_link': user.address_link,
+                'exp': datetime.utcnow() + timedelta(minutes=30)
             }, app.config['SECRET_KEY'], 
             )
-
+            if user.role == "professional":
+                admins = Users.query.filter_by(role = "admin").all()
+                emails = [a.email for a in admins]
+                ver = Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver
+                if ver == 0:
+                    for email in emails:
+                        data = {"msg" : "professionals are wiating for your approval!!", "email" : email}
+                        send_notification(data)
             return json.dumps({
                 'token': token, 
                 'message': 'Login successful',
                 'name': user.first_name,
+                'email' : user.email,
                 'role':user.role
             }), 200
         else:

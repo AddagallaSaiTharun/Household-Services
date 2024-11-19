@@ -4,7 +4,11 @@ from flask_restful import Resource
 from flask import request
 from application.utils.validation import preprocesjwt
 from application.data.database import db
-from application.data.models import ServiceRequests
+from application.data.models import ServiceRequests, Users
+from application.jobs.sse import send_notification
+
+from datetime import date
+
 
 
 class ServiceRequestAPI(Resource):
@@ -29,7 +33,6 @@ class ServiceRequestAPI(Resource):
             query = query.filter(ServiceRequests.customer_id == user_id)
         elif role == "professional":
             query = query.filter(ServiceRequests.prof_id == user_id)
-        # Apply filters dynamically
         for column in [
             "srvcreq_id", "srvc_id", "customer_id", "prof_id", 
             "date_srvcreq", "date_cmpltreq", "srvc_status", 
@@ -38,8 +41,11 @@ class ServiceRequestAPI(Resource):
         ]:
             if column in data:
                 query = query.filter(getattr(ServiceRequests, column) == data[column])
+                
 
         srvcreqs = query.order_by(ServiceRequests.date_srvcreq.desc()).all()
+
+        
 
         response = {
             "message": []
@@ -51,8 +57,8 @@ class ServiceRequestAPI(Resource):
                 'srvc_id': srvcreq.srvc_id, 
                 'customer_id': srvcreq.customer_id, 
                 'prof_id': srvcreq.prof_id, 
-                'date_srvcreq': srvcreq.date_srvcreq, 
-                'date_cmpltreq': srvcreq.date_cmpltreq, 
+                'date_srvcreq': srvcreq.date_srvcreq.strftime('%Y-%m-%d'), 
+                'date_cmpltreq': srvcreq.date_cmpltreq.strftime('%Y-%m-%d'), 
                 'srvc_status': srvcreq.srvc_status, 
                 'remarks': srvcreq.remarks, 
                 'cust_rating': srvcreq.cust_rating, 
@@ -94,7 +100,7 @@ class ServiceRequestAPI(Resource):
                     "prof_dscp": srvcreq.prof_service.prof_dscp,
                     "prof_srvcid": srvcreq.prof_service.prof_srvcid,
                     "prof_ver": srvcreq.prof_service.prof_ver,
-                    "prof_join_date": srvcreq.prof_service.prof_join_date,
+                    "prof_join_date": srvcreq.prof_service.prof_join_date.strftime('%Y-%m-%d'),
                 })
 
             response["message"].append(srvcreq_data)
@@ -119,9 +125,9 @@ class ServiceRequestAPI(Resource):
         if error or role != "user":
             return json.dumps({'error': 'Unauthorized access'}), 401
 
-        data = request.get_json()
+        data = request.form
+        
         required_fields = ["srvc_id", "prof_id", "remarks"]
-
         if not all(field in data for field in required_fields):
             missing_fields = [field for field in required_fields if field not in data]
             return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
@@ -130,18 +136,20 @@ class ServiceRequestAPI(Resource):
             srvc_id=data["srvc_id"],
             customer_id=user_id,
             prof_id=data["prof_id"],
-            date_srvcreq=data.get("date_srvcreq", datetime.now().date()),
-            date_cmpltreq=data.get("date_cmpltreq", datetime.now().date()),
-            srvc_status="Pending",
+            date_srvcreq=datetime.strptime(data.get("date_srvcreq"), '%Y-%m-%d').date(),
+            date_cmpltreq=datetime.strptime(data.get("date_srvcreq"), '%Y-%m-%d').date(),
+            srvc_status="pending",
             remarks=data["remarks"],
             cust_rating=None,
             prof_rating=None,
             cust_review=None,
             prof_review=None
         )
-
+        pro_email = Users.query.filter_by(user_id=data["prof_id"]).first().email
         db.session.add(srvcreq)
         db.session.commit()
+        msg = {"msg" : "You have a new request!! Please reload your page🔄️", "email" : pro_email}
+        send_notification(msg)
         return json.dumps({"message": "Service request created successfully", "srvcreq_id": srvcreq.srvcreq_id}), 201
 
     def put(self):
@@ -165,6 +173,11 @@ class ServiceRequestAPI(Resource):
 
         data = request.get_json()
 
+        pro_id = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"]).first().prof_id
+        user = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"]).first().customer_id
+
+        user_email = Users.query.filter_by(user_id=user).first().email
+        pro_email = Users.query.filter_by(user_id=pro_id).first().email
         if role == "user":
             srvcreq = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"], customer_id=user_id).first()
         elif role == "professional":
@@ -173,23 +186,37 @@ class ServiceRequestAPI(Resource):
             srvcreq = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"]).first()
         else:
             return json.dumps({'error': 'Unauthorized access'}), 401
-
         if not srvcreq:
             return json.dumps({"error": f"{data['srvcreq_id']} not found "}), 400
-
         if role in ("user", "admin"):
-            if "cust_rating" in data:
-                srvcreq.cust_rating = data["cust_rating"]
-            if "cust_review" in data:
-                srvcreq.cust_review = data["cust_review"]
-        if role in ("professional", "admin"):
-            if "prof_rating" in data:
-                srvcreq.prof_rating = data["prof_rating"]
-            if "prof_review" in data:
-                srvcreq.prof_review = data["prof_review"]
-        if role == "admin":
-            if "srvc_status" in data:
-                srvcreq.srvc_status = data["srvc_status"]
+            if "rating" in data:
+                srvcreq.prof_rating = data["rating"]
+            if "review" in data:
+                srvcreq.prof_review = data["review"]
 
+            if data['srvc_status'] == "canceled" and srvcreq.srvc_status == "pending":
+                srvcreq.srvc_status = data['srvc_status']
+                data = {"msg" : f"You have cancelled your request!! Retry again!", "email" : user_email}
+                send_notification(data)
+            
+
+        if role in ("professional", "admin"):
+            if "rating" in data:
+                srvcreq.cust_rating = data["rating"]
+            if "review" in data:
+                srvcreq.cust_review = data["review"]
+            if "srvc_status" in data:
+                if data['srvc_status'] in ("accepted","rejected") and srvcreq.srvc_status == "pending":
+                    srvcreq.srvc_status = data['srvc_status']
+                    d = {"msg" : f"Your request has been {data['srvc_status']} by the professional! check your orders!!", "email" : user_email}
+                    send_notification(d)
+                if data['srvc_status'] == "completed" and srvcreq.srvc_status == "accepted":
+                    srvcreq.srvc_status = data['srvc_status']
+                    srvcreq.date_cmpltreq = date.today()
+                    d = {"msg" : f"Your task has been complete. Please rate the service!!🎉🎉", "email" : user_email}
+                    send_notification(d)
+                    d = {"msg" : f"Your task has been complete. Please rate the customer!!🎉🎉", "email" : pro_email, "show_review_form" : True}
+                    send_notification(d)
+  
         db.session.commit()
         return json.dumps({'message': 'Service request updated successfully'}), 200

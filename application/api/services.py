@@ -27,7 +27,8 @@ class ServiceAPI(Resource):
         }
 
         if filter_args:
-            query = query.filter_by(**filter_args)
+            query = query.filter(*(getattr(Services, key) == value for key, value in filter_args.items()))
+
 
         services = query.all()
         result = []
