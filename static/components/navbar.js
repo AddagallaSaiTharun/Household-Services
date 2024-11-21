@@ -1,34 +1,26 @@
 const navbar = Vue.component("navbar", {
   template: `
-    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #fff; color: white;">
-      <div class="left">
-        <router-link class="navbar-brand" to="/" style="text-decoration: none;color:black">
-          <h2 style="margin: 0; font-size: 24px;">Fix-Up-Crew</h2>
-        </router-link>
-      </div>
 
-      <div class="right" style="display: flex; align-items: center; gap: 20px;">
-        <!-- Login & Signup Links -->
-        <div v-if="!isUserLoggedIn" style="display: flex; gap: 15px;">
-          <router-link class="nav-link" to="/login" style="text-decoration: none; color: white; font-size: 16px; padding: 8px 12px; border-radius: 5px; transition: background-color 0.3s;" @mouseover="hoverLink($event)" @mouseleave="leaveLink($event)">
-            Login
-          </router-link>
-          <router-link class="nav-link" to="/signup" style="text-decoration: none; color: white; font-size: 16px; padding: 8px 12px; border-radius: 5px; transition: background-color 0.3s;" @mouseover="hoverLink($event)" @mouseleave="leaveLink($event)">
-            Signup
-          </router-link>
+
+  <div class="navbar">
+        <div class="logo">
+            <img src="static/images/home/Image.jpg" alt="Logo" />
+            Fix-Up-Crew
         </div>
-
-        <!-- User Actions (Cart, Profile) -->
-        <div v-if="isUserLoggedIn" style="display: flex; align-items: center; gap: 15px;">
-          <!-- Cart Icon -->
+        <ul class="nav-links ps-4">
+            <li><RouterLink to="/" :class="{active: $route.path === '/'}">Home</RouterLink></li>
+            <li><RouterLink to="/search" :class="{active: $route.path === '/search'}">Search</RouterLink></li>
+            <li v-if="token"><RouterLink to="/summary" :class="{active: $route.path === '/summary'}">Summary</RouterLink></li>
+        </ul>
+        <div v-if="!isAdmin & !isPro">
           <img src="/static/icons/trolley.png" alt="Cart" style="width: 24px; cursor: pointer; margin-right: 8px;"/>
-
-          <!-- Profile Icon with Dropdown -->
-          <div style="position: relative;">
-            <img src="/static/icons/profile.png" alt="Profile" @click="toggleprofile" style="width: 24px; cursor: pointer;"/>
+        </div>
+        
+        <div style="position: relative;">
+            <img class="ps-1" src="/static/icons/profile.png" alt="Profile" @click="toggleprofile" style="width: 24px; cursor: pointer;"/>
             
             <!-- Dropdown Menu -->
-            <div id="dropdownMenu" style="display: none; position: absolute; top: 35px; right: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); padding: 10px; width: 150px; color: #333;">
+            <div class="ps-1" id="dropdownMenu" style="display: none; z-index:2; position: absolute; top: 35px; right: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); padding: 10px; width: 150px; color: #333;">
               <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px;" href="#">{{ user }}</a>
               <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px;" href="#">Settings</a>
               <a style="display: block; padding: 8px 10px; text-decoration: none; color: black; font-size: 14px; cursor: pointer;" @click="logout">Logout</a>
@@ -39,9 +31,14 @@ const navbar = Vue.component("navbar", {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </nav>
+    </div>
+
+
+
+
+    
+    
+    
   `,
   data() {
     return {
@@ -97,6 +94,10 @@ const navbar = Vue.component("navbar", {
           window.location.href = "/#/login";
         }
       }
+      if (this.isAdmin) {
+        window.location.href = "/#/admin";
+      }
+      
 
       try {
         const pro_data = await axios.get("/api/ispro", {
@@ -111,6 +112,10 @@ const navbar = Vue.component("navbar", {
           localStorage.removeItem("user");
           window.location.href = "/#/login";
         }
+      }
+
+      if(this.isPro){
+        window.location.href = "/#/professional";
       }
     }
   },

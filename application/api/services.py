@@ -22,7 +22,7 @@ class ServiceAPI(Resource):
         
         filter_args = {
             column: request.args.get(column)
-            for column in ["service_id", "service_name", "time_req", "service_base_price", "service_image", "service_dscp"]
+            for column in ["service_id", "service_name", "time_req", "service_base_price", "service_image", "service_dscp", "category"]
             if request.args.get(column) is not None
         }
 
@@ -34,7 +34,8 @@ class ServiceAPI(Resource):
         result = []
         for service in services:
             # Decode the base64 image
-            decoded_image = base64.b64decode(service.service_image)
+            decoded_image = base64.b64decode(service.service_image) if service.service_image else None
+
 
             # Create response content
             result.append({
@@ -42,7 +43,7 @@ class ServiceAPI(Resource):
                 'service_name': service.service_name,
                 'time_req': service.time_req,
                 'service_base_price': service.service_base_price,
-                'service_image': base64.b64encode(decoded_image).decode('utf-8'),
+                'service_image': base64.b64encode(decoded_image).decode('utf-8') if service.service_image else None,
                 'service_dscp': service.service_dscp
             })
         
