@@ -33,7 +33,7 @@ const category_component = Vue.component("category", {
                       </div>
                       <div class="col-3 d-flex align-items-center p-3">
                         <img 
-                          :src="service.service_image || 'static/images/default_service.jpg'" 
+                          :src="'data:image/jpg;base64,'+service.service_image || 'static/images/default_service.jpg'" 
                           class="img-fluid rounded-start" 
                           alt="Service Image">
                       </div>

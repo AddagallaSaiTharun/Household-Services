@@ -563,7 +563,7 @@ border-color: #7b6ef6;
   content: "";
   position: absolute;
   left: 0;
-  bottom: -8px;
+  bottom: -6px;
   width: 100%;
   height: 3px;
   background-color: #7b6ef6;
@@ -795,4 +795,111 @@ border-color: #7b6ef6;
 
 .price-range p {
   margin: 5px 0;
+}
+
+
+.profile-card {
+  width: 300px;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  background-color: #fff;
+}
+
+.edit-icon {
+  position: relative;
+  top: 4vh;
+  right: -20vh;
+  color: #555;
+  cursor: pointer;
+}
+
+.profile-card h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.profile-card p {
+  font-size: 16px;
+  color: #666;
+}
+
+.profile-info .info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.profile-info .info-item i {
+  color: #7a47d1;
+  margin-right: 10px;
+}
+
+.info-item .status {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.info-item {
+  position: relative;
+  /* Set the parent container to relative for positioning context */
+}
+
+.corner-badge {
+  position: absolute;
+  top: 3.5vh;
+  right: 3vh;
+  transform: translate(50%, -50%);
+}
+
+
+.overview-box h6 {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.overview-box p {
+  margin: 0;
+  font-size: 2rem;
+  color: #343a40;
+}
+
+.activity-log .activity-item {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 15px;
+}
+
+.activity-log .activity-item:last-child {
+  border-bottom: none;
+}
+
+.badge {
+  font-size: 0.875rem;
+  padding: 0.4em 0.8em;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.activity-log {
+  max-height: 400px; /* Adjust as needed */
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+
+.charts .chart-container {
+	background-color: #313348;
+}
+
+.charts .chart-container h3 {
+	color: #9CA3AF;
+}
+
+.chart-container {
+  height: 300px;
 }

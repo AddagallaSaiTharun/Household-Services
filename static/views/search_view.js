@@ -6,6 +6,7 @@ import search_bar from "../components/search-bar.js";
 const search_view = Vue.component("search_view", {
   template: `
     <div id="search">
+      <navbar></navbar>
       <search_hero></search_hero>
       <search-bar @update-search="updateSearchQuery"></search-bar>
 

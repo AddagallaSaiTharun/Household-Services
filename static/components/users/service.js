@@ -1,6 +1,12 @@
 import serv_req_form from "./serv_req_form.js";
+import navbar from "../navbar.js";
+import footerman from "../footer.js";
+
+
 const service = Vue.component("service", {
   template: `
+  <div id="service">
+    <navbar />
     <div style="margin: 30px; font-family: Arial, sans-serif;">
   <div v-if="service" style="font-size: 36px; font-weight: bold; color: #333; margin-bottom: 20px;">
     {{ service.service_name }}
@@ -147,6 +153,8 @@ const service = Vue.component("service", {
     <serv_req_form :srvc_id="service_id" :prof_id="selectedProfId" @close="closeForm"></serv_req_form>
   </div>
 </div>
+    <footerman />
+  </div>
 
   `,
   components: {
@@ -195,6 +203,7 @@ const service = Vue.component("service", {
     this.pros = JSON.parse(pros.data).message;
     console.log(this.pros);
   },
+  components: { navbar, footerman },
 });
 
 export default service;

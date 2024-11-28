@@ -44,7 +44,8 @@ class ServiceAPI(Resource):
                 'time_req': service.time_req,
                 'service_base_price': service.service_base_price,
                 'service_image': base64.b64encode(decoded_image).decode('utf-8') if service.service_image else None,
-                'service_dscp': service.service_dscp
+                'service_dscp': service.service_dscp,
+                "category":service.category
             })
         
         return json.dumps({"content": result})

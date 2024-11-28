@@ -23,34 +23,32 @@ class UserLogin(Resource):
             return json.dumps({'error': 'Missing request body'}), 400
         password = data.get('password')
         user = Users.query.filter_by(email=data.get('email')).first()
-        if user and bcrypt.check_password_hash(user.password, password):
-            token = jwt.encode({
-                'user_id': user.user_id,
-                'email': user.email,
-                'role': user.role,
-                'name': user.first_name,
-                'address': user.address,
-                'address_link': user.address_link,
-                'exp': datetime.utcnow() + timedelta(minutes=30)
-            }, app.config['SECRET_KEY'], 
-            )
-            if user.role == "professional":
-                admins = Users.query.filter_by(role = "admin").all()
-                emails = [a.email for a in admins]
-                ver = Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver
-                if ver == 0:
-                    for email in emails:
-                        data = {"msg" : "professionals are wiating for your approval!!", "email" : email}
-                        send_notification(data)
-            return json.dumps({
-                'token': token, 
-                'message': 'Login successful',
-                'name': user.first_name,
-                'email' : user.email,
-                'role':user.role
-            }), 200
-        else:
-            return json.dumps({'message': 'Invalid credentials'}), 401
-
-
-
+        if not user:
+            return json.dumps({'message': 'No user Found'}), 401
+        if not bcrypt.check_password_hash(user.password, password):
+            return json.dumps({'error': 'Invalid password'}), 401
+        token = jwt.encode({
+            'user_id': user.user_id,
+            'email': user.email,
+            'role': user.role,
+            'name': user.first_name,
+            'address': user.address,
+            'address_link': user.address_link,
+            'exp': datetime.utcnow() + timedelta(minutes=30)
+        }, app.config['SECRET_KEY'], 
+        )
+        if user.role == "professional":
+            admins = Users.query.filter_by(role = "admin").all()
+            emails = [a.email for a in admins]
+            ver = Professionals.query.filter_by(prof_userid=user.user_id).first().prof_ver
+            if ver == 0:
+                for email in emails:
+                    data = {"msg" : "professionals are wiating for your approval!!", "email" : email}
+                    # send_notification(data)
+        return json.dumps({
+            'token': token, 
+            'message': 'Login successful',
+            'name': user.first_name,
+            'email' : user.email,
+            'role':user.role
+        }), 200
