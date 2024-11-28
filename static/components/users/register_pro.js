@@ -1,5 +1,10 @@
+import navbar from "../navbar.js";
+import footerman from "../footer.js";
+
 const register_pro = Vue.component("register_pro", {
   template: `
+  <div id="register-pro">
+    <navbar />
       <div v-if="user" style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);margin-top:1in">
   <h2 style="font-size: 24px; color: #333; text-align: center; margin-bottom: 20px;">Register as a Pro</h2>
   <form @submit.prevent="registerPro" style="display: flex; flex-direction: column; gap: 15px;">
@@ -7,8 +12,8 @@ const register_pro = Vue.component("register_pro", {
     <h2 style="font-size: 20px; color: #333; text-align: center;">Welcome, {{ user.first_name }}!</h2>
     
     <div style="display: flex; flex-direction: column;">
-      <label for="experience" style="font-size: 16px; color: #555; margin-bottom: 5px;">Experience:</label>
-      <input type="text" id="experience" v-model="exp" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
+      <label for="experience" style="font-size: 16px; color: #555; margin-bottom: 5px;">Experience in years:</label>
+      <input type="number" id="experience" v-model="exp" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
     </div>
 
     <div style="display: flex; flex-direction: column;">
@@ -17,7 +22,7 @@ const register_pro = Vue.component("register_pro", {
     </div>
 
     <div style="display: flex; flex-direction: column;">
-      <label for="service_id" style="font-size: 16px; color: #555; margin-bottom: 5px;">Service ID:</label>
+      <label style="font-size: 16px; color: #555; margin-bottom: 5px;">Service Name:</label>
       <select id="service_id" v-model="service_id" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
         <option value="">Select a service</option>
         <option v-for="service in services" :value="service.service_id">{{ service.service_name }}</option>
@@ -31,6 +36,8 @@ const register_pro = Vue.component("register_pro", {
     </div>
   </form>
 </div>
+    <footerman/>
+  </div>
 
     `,
   async created() {
@@ -56,7 +63,7 @@ const register_pro = Vue.component("register_pro", {
     return {
       user: null,
       token: localStorage.getItem("token"),
-      exp: null,
+      exp: 0,
       desc: null,
       service_id: null,
       join_date: Date.now(),
@@ -77,14 +84,11 @@ const register_pro = Vue.component("register_pro", {
           "/api/professional", formData,
           {
             headers: {
-              Authorization: "Bearer " + this.token,
-              'Content-Type': 'multipart/form-data' 
+              Authorization: "Bearer " + this.token
             },
           }
         )
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/";
+        window.location.href = "/professional";
       } catch (error) {
         console.error(
           "Error registering:",
@@ -93,6 +97,7 @@ const register_pro = Vue.component("register_pro", {
       }
     },
   },
+  components: { navbar, footerman },
 });
 
 export default register_pro;

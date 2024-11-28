@@ -3,7 +3,7 @@ from flask import render_template, url_for, session, Response, request, session
 from authlib.integrations.flask_client import OAuth
 from application.config import oAuth_cred
 from application.data.database import db
-from application.data.models import Professionals, Users, ServiceRequests
+from application.data.models import Professionals, Users, ServiceRequests, Services
 import jwt
 import json
 from application.utils.validation import preprocesjwt
@@ -172,3 +172,8 @@ def verify_otp():
         return json.dumps({"success": True, "message": "Closed the service"}), 200
     else:
         return json.dumps({"success": False, "message": "Invalid OTP"}), 400
+    
+@app.route('/unique_categories', methods=['GET'])
+def unique_categories():
+    categories = Services.query.with_entities(Services.category).filter(Services.category.isnot(None)).distinct().all()
+    return json.dumps({'categories': [category_en.category for category_en in categories]}), 200

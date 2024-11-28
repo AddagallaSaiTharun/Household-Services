@@ -1,5 +1,10 @@
+import navbar from "../navbar.js";
+import footerman from "../footer.js";
+
 const add_service = Vue.component("add-service", {
   template:  `
+  <div id="add-service">
+    <navbar />
   <div style="max-width: 500px; margin: auto; padding: 20px; margin-top:1in;background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif;">
       <h2 style="text-align: center; font-size: 24px; color: #333; margin-bottom: 20px;">Add Service</h2>
       
@@ -36,6 +41,8 @@ const add_service = Vue.component("add-service", {
           </button>
         </div>
       </form>
+  </div>
+  <footerman/>
   </div>
   `,
   data() {
@@ -85,7 +92,8 @@ const add_service = Vue.component("add-service", {
               console.error("There was an error submitting the form:", error);
           }
       }
-  }
+  },
+  components: { navbar, footerman },
 });
 
 export default add_service;

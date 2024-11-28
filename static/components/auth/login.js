@@ -62,13 +62,19 @@ const Login = Vue.component("LoginComponent", {
           localStorage.setItem("token", data.token);
           localStorage.setItem("email", data.email);
           localStorage.setItem("user", data.name);
+          if(data.role=="user")
           window.location.href = "/";
-        } else {
+        else
+          window.location.href = "/#/professional";
+
+        } 
+        else {
           alert("Login failed: " + data.message);
         }
       } catch (error) {
         console.error("Error during login:", error);
-        alert("An error occurred. Please try again.");
+        let message = JSON.parse(error["response"].data);
+        alert(message["message"]);
       }
     },
   },
