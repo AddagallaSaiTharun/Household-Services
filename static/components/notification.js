@@ -48,6 +48,7 @@ const noti = Vue.component("noti", {
         const data = event.data;
         this.notification = data; 
       });
+      console.log(this.notification);
 
 
       source.addEventListener("error", (event) => {

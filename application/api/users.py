@@ -25,7 +25,6 @@ class UserAPI(Resource):
         user_id, role, _, error = preprocesjwt(request)
         if error:
             return json.dumps({'error': 'Unauthorized access'}), 401
-
         user_col = ["user_id", 'email', 'first_name', 'last_name', 'age', 'gender', 'role', 'user_image_url', 'password', 'phone', 'address', 'address_link', 'pincode']        
         if role == "professional":
             user = Users.query.filter_by(user_id=user_id).first()

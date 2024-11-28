@@ -14,8 +14,6 @@ from application.jobs import tasks
 
 class ProfessionalAPI(Resource):
     def get(self):
-        
-
         """
         Returns professionals based on the data in the request. 
         If no data is provided, returns all professionals.
@@ -115,12 +113,11 @@ class ProfessionalAPI(Resource):
                 prof_srvcid=data['prof_srvcid'],
                 prof_join_date=datetime.strptime(data['prof_join_date'], '%Y-%m-%d').date()
             )
-            data = dict(data)
             db.session.add(prof)
             db.session.commit()
             admins_emails = Users.query.filter_by(role = "admin").all()
             emails = [a.email for a in admins_emails]
             for email in emails:
                 data = {"msg" : "professionals are wiating for your approval!!", "email" : email}
-                send_notification(data)            
+                # send_notification(data)            
             return json.dumps({"message": "Professional created successfully","prof_userid": prof.prof_userid,}), 201
