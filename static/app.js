@@ -10,7 +10,7 @@ import Pro_view from "./views/professional_view.js";
 import Admin_view from "./views/admin_view.js";
 import cart from "./components/cart.js";
 import order_view from "./views/orders_view.js";
-
+import rating_form from "./components/professional/rating_form.js";
 
 const routes = [
   { path: "/login", component: Login },

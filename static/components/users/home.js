@@ -1,3 +1,4 @@
+import noti from "../notification.js";
 
 
 
@@ -95,14 +96,9 @@ const Home = Vue.component("home-component", {
           <service_grp></service_grp>
         </div>
       </div>
-      <div v-if="!isAdmin && !isPro">
-        <div v-if="notification" :class="['notification', { show: isVisible }]">
-          <div class="notification-bell">
-            <i class="fas fa-bell"></i>
-          </div>
-          {{notification}}<a href="/">view</a>
-        </div>
-      </div>
+
+      <noti></noti>
+      
       
     </div>
 
@@ -115,22 +111,12 @@ const Home = Vue.component("home-component", {
       isAdmin: false,
       isPro: false,
       services: [],
-      notification: "",
-      isVisible: false,
-      hideTimeout: null,
+
       email: localStorage.getItem("email"),
     };
   },
-  watch: {
-    notification(newValue) {
-      if (newValue) {
-        this.showNotification();
-      }
-    },
-  },
 
   async created() {
-    this.setupEventSource();
     try {
       const response = await axios.get("/api/isadmin", {
         headers: {
@@ -161,37 +147,8 @@ const Home = Vue.component("home-component", {
     }
     
   },
-  methods: {
-    open_service(id) {
-      window.location.href = "/#/service/" + id;
-    },
-    setupEventSource() {
-      const source = new EventSource("http://127.0.0.1:5000/events");
-
-      source.addEventListener(this.email, (event) => {
-        if(event.data == true){
-            show_review_form = true;
-        }
-        this.notification = event.data; 
-        console.log(this.notification)
-      });
-
-      source.addEventListener("error", (event) => {
-        console.error("EventSource error:", event);
-        source.close(); 
-        setTimeout(() => this.setupEventSource(), 5000); 
-      });
-    },
-    showNotification() {
-      this.isVisible = true;
-      clearTimeout(this.hideTimeout);
-      this.hideTimeout = setTimeout(() => {
-        this.isVisible = false;
-      }, 10000); // Hide after 5 seconds
-    },
-  },
-  beforeDestroy() {
-    clearTimeout(this.hideTimeout);
+  children:{
+    noti
   }
 });
 

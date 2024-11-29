@@ -903,3 +903,12 @@ border-color: #7b6ef6;
 .chart-container {
   height: 300px;
 }
+
+::-webkit-scrollbar {
+  display: none; /* Hides the scrollbar in WebKit browsers (Chrome, Safari) */
+}
+
+body {
+  -ms-overflow-style: none; /* Hides the scrollbar in Internet Explorer */
+  scrollbar-width: none; /* Hides the scrollbar in Firefox */
+}

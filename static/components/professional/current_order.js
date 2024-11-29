@@ -154,9 +154,7 @@ const current_order = Vue.component("current_order", {
   <div
     v-if="showForm"
     style="
-      position: fixed;
-      top: 0;
-      left: 0;
+      
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
@@ -167,6 +165,8 @@ const current_order = Vue.component("current_order", {
     @click.self="closeForm"
   >
     <otp_form
+    style="position: fixed;
+      top: 40%;"
       :engaged="engaged"
       :service_id="current_order[0].srvcreq_id"
       @toggleengaged="toggleengaged"
@@ -176,6 +176,7 @@ const current_order = Vue.component("current_order", {
 </div>
 
     `,
+    
   data() {
     return {
       token: localStorage.getItem("token"),

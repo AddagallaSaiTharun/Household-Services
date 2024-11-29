@@ -1,21 +1,40 @@
 const noti = Vue.component("noti", {
+  name:"noti",
   template: `
-    <div>
-      <div v-if="isAdmin">
-        <div v-if="notification" :class="['notification', { show: isVisible }]">
-          <div class="notification-bell">
-            <i class="fas fa-bell"></i>
+    <div
+          v-if="notification"
+          :class="['notification', { show: isVisible }]"
+          style="
+            position: fixed;
+            height: max-content;
+            top: 20px;
+            right: 20px;
+            background-color: #fffae6;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            color: #333;
+          "
+        >
+          <div
+            class="notification-bell"
+            style="display: inline; margin-right: 8px"
+          >
+            <i class="fas fa-bell" style="color: #ff9800"></i>
           </div>
-             {{ notification }}<a href="/">view</a>
+          {{ notification }}
+          <a
+            href="/"
+            style="color: #007bff; text-decoration: none; margin-left: 5px"
+            >view</a
+          >
         </div>
-      </div>
-    </div>
 
   `,
   data() {
     return {
       token: localStorage.getItem("token"),
-      isAdmin: false,
       notification: null,
       isVisible: false,
       hideTimeout: null,
@@ -66,10 +85,8 @@ const noti = Vue.component("noti", {
     },
   },
   async created() {
-    await this.checkAdminStatus();
-    if (this.isAdmin) {
-      this.setupEventSource();
-    }
+    this.setupEventSource();
+    
   },
   beforeDestroy() {
     clearTimeout(this.hideTimeout);

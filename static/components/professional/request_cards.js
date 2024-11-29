@@ -10,7 +10,7 @@ const request_cards = Vue.component("request_cards", {
       </div>
 
       <div
-        v-if="requests.length"
+        v-if="pending_requests.length"
         style="
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(228px, 1fr));
@@ -108,6 +108,9 @@ const request_cards = Vue.component("request_cards", {
             </div>
           </div>
         </div>
+      </div>
+      <div v-else>
+        <h2>No current requests...</h2>
       </div>
     </div>
     

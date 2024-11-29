@@ -117,13 +117,13 @@ def sendOtp():
     _, _, _, error = preprocesjwt(request)
     if error:
         return json.dumps({'error': 'Unauthorized access'}), 401
-
     data = request.json
     service_id = data.get("service_id")
     user_id = ServiceRequests.query.filter_by(srvcreq_id=service_id).first().customer_id
-    user_email = Users.query.filter_by(user_id=user_id).first().email
 
-    otp = f"{random.randint(0, 9999):04}"  # Ensure OTP is a 4-digit number
+    user_email = Users.query.filter_by(user_id=user_id).first().email
+    print(user_email)
+    otp = f"{random.randint(0, 999999):06}"  # Ensure OTP is a 4-digit number
     session['otp'] = otp
     session['otp_expiry'] = (datetime.now() + timedelta(minutes=3)).isoformat()  # Store as ISO format
     session['service_id'] = service_id  # Store service_id in the session

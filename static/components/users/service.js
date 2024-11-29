@@ -1,9 +1,12 @@
-import serv_req_form from "./serv_req_form.js";
+
 import navbar from "../navbar.js";
 import footerman from "../footer.js";
-
+import serv_req_form from "./serv_req_form.js";
 
 const service = Vue.component("service", {
+  components: {
+    serv_req_form,
+  },
   template: `
   <div id="service">
     <navbar />
@@ -18,13 +21,13 @@ const service = Vue.component("service", {
       <img
         :src="'/static/images/' + service_id + '.jpg'"
         alt="Service Image"
-        style="width: 100%; border-radius: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);"
+        style="width: 100%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);"
       />
     </div>
     
     <!-- Service Description Section -->
-    <div style="width: 70%; padding: 20px; background-color: #f9f9f9; border-radius: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-      <div style="width: 100%; padding: 20px; background-color: #f9f9f9; border-radius: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <div style="width: 70%; padding: 20px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <div style="width: 100%; padding: 20px; background-color: #f9f9f9;  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
   <h2 style="font-size: 24px; color: #333; margin-bottom: 20px;">Service Instructions:</h2>
   
   <div style="margin-bottom: 20px;">
@@ -95,12 +98,11 @@ const service = Vue.component("service", {
         text-align: center;
         background-color: #fff;
         border: 1px solid #ddd;
-        border-radius: 15px;
+
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s ease;
       "
-      @mouseover="hoverCard(pro.prof_userid)"
-      @mouseleave="leaveCard(pro.prof_userid)"
+
     >
       <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
         <img src="/static/icons/profile_big.jpg" alt="Professional Image" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover;"/>
@@ -121,7 +123,7 @@ const service = Vue.component("service", {
           background-color: #007bff;
           color: white;
           border: none;
-          border-radius: 8px;
+
           cursor: pointer;
           font-size: 14px;
           margin-top: 10px;
@@ -157,9 +159,7 @@ const service = Vue.component("service", {
   </div>
 
   `,
-  components: {
-    serv_req_form,
-  },
+  
 
 
   data() {

@@ -1,4 +1,5 @@
 const rating_form = Vue.component("rating_form", {
+  name: "rating_form",
   props: ["srvc_req_id", "showratingForm"],
   template: `
         <div>

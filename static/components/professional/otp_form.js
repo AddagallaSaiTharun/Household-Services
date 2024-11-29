@@ -1,3 +1,6 @@
+import rating_form from "./rating_form.js";
+
+
 const otp_form = Vue.component("otp_form", {
   props: ["service_id", "engaged"],
   name: "otp_form",
@@ -41,6 +44,9 @@ const otp_form = Vue.component("otp_form", {
       otp: null,
       showratingForm: false,
     };
+  },
+  children:{
+    rating_form
   },
   methods: {
     close_review(value) {

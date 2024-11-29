@@ -8,7 +8,7 @@ const navbar = Vue.component("navbar", {
     <ul class="nav-links ps-4">
       <li><RouterLink to="/" :class="{active: $route.path === '/'}">Home</RouterLink></li>
       <li><RouterLink to="/search" :class="{active: $route.path === '/search'}">Search</RouterLink></li>
-      <li v-if="token"><RouterLink to="/summary" :class="{active: $route.path === '/summary'}">Summary</RouterLink></li>
+      <li v-if="token"><RouterLink to="/usersummary" :class="{active: $route.path === '/summary'}">Summary</RouterLink></li>
     </ul>
     <RouterLink to="/cart" v-if="!isAdmin && !isPro">
       <img src="/static/icons/trolley.png" alt="Cart" style="width: 24px; cursor: pointer; margin-right: 8px;" />
@@ -69,7 +69,8 @@ const navbar = Vue.component("navbar", {
       this.$router.push("/login");
     },
   },
-  async created() {
+  
+  async Created() {
     if (this.token) {
       try {
         const response = await axios.get("/api/isadmin", {

@@ -4,29 +4,29 @@ import noti from "../components/notification.js";
 const admin_home = Vue.component("admin-home", {
   template: `
     <div>
-    <navbar />
-    <noti></noti>
-    <h2>This is the admin page</h2>
-    <button class="btn btn-primary" @click="add_service">Add_Service</button>
-    <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-        <div class="col-md-4" v-for="(pro, index) in pros" :key="index">
-            <div v-if="pro.prof_ver == 0">
-                <div class="card" style="width: 2.8in; margin: 10px;">
-                    <div class="card-body">
-                      <center>
-                        <img src="static/icons/profile_big.jpg" alt="">
-                        <h5 class="card-title">name : {{ pro['name'] }}</h5>
-                        <p class="card-text">Pro of : {{ pro['service_name'] }}</p>
-                        <p class="card-text">Pro for {{ pro['prof_exp'] }} years </p>
-                        <p class="card-text">description {{ pro['prof_dscp'] }}</p>
-                        <button class="btn btn-primary" @click="approve_pro(pro.prof_userid)">Approve Pro</button>
-                      </center>
-                    </div>
-                </div>
-             </div>
-        </div>
-    </div>
-</div>
+      <navbar />
+      <noti></noti>
+      <h2>This is the admin page</h2>
+      <button class="btn btn-primary" @click="add_service">Add_Service</button>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+          <div class="col-md-4" v-for="(pro, index) in pros" :key="index">
+              <div v-if="pro.prof_ver == 0">
+                  <div class="card" style="width: 2.8in; margin: 10px;">
+                      <div class="card-body">
+                        <center>
+                          <img src="static/icons/profile_big.jpg" alt="">
+                          <h5 class="card-title">name : {{ pro['name'] }}</h5>
+                          <p class="card-text">Pro of : {{ pro['service_name'] }}</p>
+                          <p class="card-text">Pro for {{ pro['prof_exp'] }} years </p>
+                          <p class="card-text">description {{ pro['prof_dscp'] }}</p>
+                          <button class="btn btn-primary" @click="approve_pro(pro.prof_userid)">Approve Pro</button>
+                        </center>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 
 
     `,

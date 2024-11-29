@@ -1,7 +1,7 @@
-const serv_req_form = Vue.component("req_form", {
+const serv_req_form = Vue.component("serv_req_form", {
   name: "serv_req_form",
   template: `
-      <div style="background-color: white; padding: 20px; border-radius: 10px; width: 3in; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
+      <div style="background-color: white; padding: 20px; border-radius: 10px; width: 5in; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
         <h2 style="margin-bottom: 15px; font-size: 24px; color: #333;">Create Service Request</h2>
         <form @submit.prevent="submitForm">
           <div style="margin-bottom: 15px;">
@@ -21,7 +21,7 @@ const serv_req_form = Vue.component("req_form", {
             <label style="font-weight: bold;" for="remarks">Remarks:</label>
             <textarea v-model="remarks" rows="3" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
           </div>
-          <button type="submit" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit Request</button>
+          <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; transition: background-color 0.3s ease ; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit Request</button>
           <button type="button" @click="$emit('close')" style="width: 100%; padding: 10px; margin-top: 10px; background-color: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
           <div v-if="message" :style="{color: error ? 'red' : 'green', fontSize: '14px', marginTop: '10px'}">{{ message }}</div>
         </form>

@@ -1,3 +1,5 @@
+import noti from "./notification.js";
+
 const heroCarousel = Vue.component("heroCarousel", {
   props: [],
   template: `
@@ -39,6 +41,7 @@ const heroCarousel = Vue.component("heroCarousel", {
                 </div>
             </div>
         </div>
+        <noti></noti>
     </div>
 
       `,
@@ -48,7 +51,7 @@ const heroCarousel = Vue.component("heroCarousel", {
       user: localStorage.getItem("user"),
     };
   },
-  created() {},
+  created() {noti},
 
   methods: {},
 });

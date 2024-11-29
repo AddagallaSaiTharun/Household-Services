@@ -1,11 +1,15 @@
-import user_stats from "../components/user_stats.js";
-import current_order from "../components/current_order.js";
+import user_stats from "../components/professional/user_stats.js";
+import current_order from "../components/professional/current_order.js";
 import navbar from "../components/navbar.js";
+import pro_navbar from "../components/pro_navbar.js";
+import request_cards from "../components/professional/request_cards.js";
+import otp_form from "../components/professional/otp_form.js";
+import noti from "../components/notification.js";
 
 const Pro_view = Vue.component("prohome", {
   template: `
   <div>
-    <navbar />
+    <pro_navbar />
     <div style="font-family: Arial, sans-serif; padding: 20px">
       <div v-if="verified">
         <div
@@ -75,35 +79,7 @@ const Pro_view = Vue.component("prohome", {
           </div>          
         </div>
         <!-- Notification Section -->
-        <div
-          v-if="notification"
-          :class="['notification', { show: isVisible }]"
-          style="
-            position: fixed;
-            height: max-content;
-            top: 20px;
-            right: 20px;
-            background-color: #fffae6;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            font-size: 14px;
-            color: #333;
-          "
-        >
-          <div
-            class="notification-bell"
-            style="display: inline; margin-right: 8px"
-          >
-            <i class="fas fa-bell" style="color: #ff9800"></i>
-          </div>
-          {{ notification }}
-          <a
-            href="/"
-            style="color: #007bff; text-decoration: none; margin-left: 5px"
-            >view</a
-          >
-        </div>
+        <noti></noti>
       </div>
 
       <!-- Verification Message -->
@@ -128,55 +104,21 @@ const Pro_view = Vue.component("prohome", {
       username: localStorage.getItem("user"),
       token: localStorage.getItem("token"),
       verified: false,
-      notification: null,
-      isVisible: false,
-      hideTimeout: null,
       email: localStorage.getItem("email"),
       engaged: false,
       current_orders: [],
     };
   },
 
-  watch: {
-    notification(newValue) {
-      if (newValue) {
-        this.showNotification();
-      }
-    },
-  },
   methods: {
     toggleengaged(value) {
       this.engaged = value;
     },
-    setupEventSource() {
-      const source = new EventSource("http://127.0.0.1:5000/events");
-      source.addEventListener(this.email, (event) => {
-        const data = event.data;
-        this.notification = data;
-      });
-      source.addEventListener("error", (event) => {
-        source.close();
-        setTimeout(() => this.setupEventSource(), 5000);
-      });
-    },
-    showNotification() {
-      this.isVisible = true;
-      clearTimeout(this.hideTimeout);
-      this.hideTimeout = setTimeout(() => {
-        this.isVisible = false;
-      }, 10000);
-    },
-  },
-  children: {
-    user_stats,
-    current_order,
   },
 
-  beforeDestroy() {
-    clearTimeout(this.hideTimeout);
-  },
+  children: {noti},
+
   async created() {
-    this.setupEventSource();
 
     const response = await axios.get("/api/professional", {
       headers: {
@@ -199,17 +141,18 @@ const Pro_view = Vue.component("prohome", {
         srvc_status: "accepted",
       },
     });
-    console.log(JSON.parse(engaged.data).message)
 
     if (JSON.parse(engaged.data).message.length) {
       this.engaged = !this.engaged;
     }
-    for(const i of JSON.parse(engaged.data).message){
+    for (const i of JSON.parse(engaged.data).message) {
       this.current_orders.push(i);
     }
-    this.current_orders.sort((a,b) => new Date(a.date_srvcreq) - new Date(b.date_srvcreq));
+    this.current_orders.sort(
+      (a, b) => new Date(a.date_srvcreq) - new Date(b.date_srvcreq)
+    );
   },
-  components: { navbar},
+  components: { pro_navbar, user_stats, current_order, request_cards },
 });
 
 export default Pro_view;
