@@ -30,7 +30,6 @@ const noti = Vue.component("noti", {
             >view</a
           >
         </div>
-
   `,
   data() {
     return {

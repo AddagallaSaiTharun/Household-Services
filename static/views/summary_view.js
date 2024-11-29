@@ -3,7 +3,16 @@ import navbar from "../components/navbar.js";
 const summmary_view = Vue.component("summmary_view", {
   template: `
     <div id="summary">
-    <navbar />
+    <div v-if="isPro">
+      <pro_navbar></pro_navbar>
+    </div>
+    <div v-else-if="isAdmin">
+      <pro_navbar></pro_navbar>
+    </div>
+    <div v-else>
+      <navbar></navbar>
+    </div>
+    
     <div class="container my-5">
     <div class="row d-flex align-items-stretch">
   <!-- Profile Section -->
@@ -114,8 +123,45 @@ const summmary_view = Vue.component("summmary_view", {
     </div>
     
     `,
+  async created() {
+    this.token = localStorage.getItem("token");
+    this.user = localStorage.getItem("user");
+    this.email = localStorage.getItem("email");
+
+    if (this.token) {
+      try {
+        const response = await axios.get("/api/isadmin", {
+          headers: { Authorization: "Bearer " + this.token },
+        });
+        this.isAdmin = response.data.message;
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          this.$router.push("/login");
+        }
+      }
+
+
+      try {
+        const pro_data = await axios.get("/api/ispro", {
+          headers: { Authorization: "Bearer " + this.token },
+        });
+        this.isPro = pro_data.data.message;
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          this.$router.push("/login");
+        }
+      }
+
+    }
+  },
   data() {
     return {
+      isAdmin: false,
+      isPro: false,
       profile: {
         image: null,
         name: null,
@@ -132,92 +178,152 @@ const summmary_view = Vue.component("summmary_view", {
   },
   methods: {
     async initBarChart() {
-      await axios.get('/api/srvcreq',{
-        headers:{
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        }
-      })
-      .then(response => {
-        const rawData = JSON.parse(response.data)["message"];
-        const statusCounts = {
-          completed: { Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0 },
-          rejected: { Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0, Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0 }
-        };
-    
-        // Map month numbers to month names
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-        // Process the data
-        rawData.forEach(item => {
-          const date = new Date(item.date_srvcreq || item.date_cmpltreq);
-          const month = monthNames[date.getMonth()];
-    
-          if (item.srvc_status === 'completed') {
-            statusCounts.completed[month]++;
-          } else if (item.srvc_status === 'rejected') {
-            statusCounts.rejected[month]++;
-          }
-        });
-    
-        // Prepare data for Chart.js
-        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const completedData = labels.map(month => statusCounts.completed[month]);
-        const rejectedData = labels.map(month => statusCounts.rejected[month]);
-        const totalData = labels.map(month => statusCounts.completed[month] + statusCounts.rejected[month]);
-    
-        // Render the chart
-        new Chart(document.getElementById('barChart'), {
-          type: 'bar',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: 'Completed',
-                data: completedData,
-                backgroundColor: '#0d6efd',
-                barPercentage: 0.4,
-              },
-              {
-                label: 'Rejected',
-                data: rejectedData,
-                backgroundColor: '#dc3545',
-                barPercentage: 0.4,
-              },
-              {
-                label: 'Total',
-                data: totalData,
-                backgroundColor: '#28a745',  // You can choose another color for the 'Total' bar
-                barPercentage: 0.4,
-              },
-            ],
+      await axios
+        .get("/api/srvcreq", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
-          options: {
-            scales: {
-              y: { beginAtZero: true, ticks: { stepSize: 5 } },
-              x: { grid: { display: false } },
+        })
+        .then((response) => {
+          const rawData = JSON.parse(response.data)["message"];
+          const statusCounts = {
+            completed: {
+              Jan: 0,
+              Feb: 0,
+              Mar: 0,
+              Apr: 0,
+              May: 0,
+              Jun: 0,
+              Jul: 0,
+              Aug: 0,
+              Sep: 0,
+              Oct: 0,
+              Nov: 0,
+              Dec: 0,
             },
-          }
+            rejected: {
+              Jan: 0,
+              Feb: 0,
+              Mar: 0,
+              Apr: 0,
+              May: 0,
+              Jun: 0,
+              Jul: 0,
+              Aug: 0,
+              Sep: 0,
+              Oct: 0,
+              Nov: 0,
+              Dec: 0,
+            },
+          };
+
+          // Map month numbers to month names
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+
+          // Process the data
+          rawData.forEach((item) => {
+            const date = new Date(item.date_srvcreq || item.date_cmpltreq);
+            const month = monthNames[date.getMonth()];
+
+            if (item.srvc_status === "completed") {
+              statusCounts.completed[month]++;
+            } else if (item.srvc_status === "rejected") {
+              statusCounts.rejected[month]++;
+            }
+          });
+
+          // Prepare data for Chart.js
+          const labels = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const completedData = labels.map(
+            (month) => statusCounts.completed[month]
+          );
+          const rejectedData = labels.map(
+            (month) => statusCounts.rejected[month]
+          );
+          const totalData = labels.map(
+            (month) =>
+              statusCounts.completed[month] + statusCounts.rejected[month]
+          );
+
+          // Render the chart
+          new Chart(document.getElementById("barChart"), {
+            type: "bar",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Completed",
+                  data: completedData,
+                  backgroundColor: "#0d6efd",
+                  barPercentage: 0.4,
+                },
+                {
+                  label: "Rejected",
+                  data: rejectedData,
+                  backgroundColor: "#dc3545",
+                  barPercentage: 0.4,
+                },
+                {
+                  label: "Total",
+                  data: totalData,
+                  backgroundColor: "#28a745", // You can choose another color for the 'Total' bar
+                  barPercentage: 0.4,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 5 } },
+                x: { grid: { display: false } },
+              },
+            },
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
         });
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
     },
     initLineChart() {
-      new Chart(document.getElementById('lineChart'), {
-        type: 'line',
+      new Chart(document.getElementById("lineChart"), {
+        type: "line",
         data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Aug', 'Sep'],
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Aug", "Sep"],
           datasets: [
             {
-              label: 'Dataset 1',
+              label: "Dataset 1",
               data: [4, 20, 5, 20, 5, 25, 9, 18],
-              borderColor: '#0d6efd',
+              borderColor: "#0d6efd",
             },
             {
-              label: 'Dataset 2',
+              label: "Dataset 2",
               data: [11, 25, 10, 25, 10, 30, 14, 23],
-              borderColor: '#dc3545',
+              borderColor: "#dc3545",
             },
           ],
         },
@@ -229,11 +335,11 @@ const summmary_view = Vue.component("summmary_view", {
         },
       });
     },
-    async initStats(){
-      let data = await axios.get("/api/user",{
+    async initStats() {
+      let data = await axios.get("/api/user", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
-        }
+        },
       });
       data = JSON.parse(data.data)["message"];
       this.profile.name = data.first_name + " " + data.last_name;
@@ -248,7 +354,7 @@ const summmary_view = Vue.component("summmary_view", {
       });
       this.profileDetails.push({
         label: "Location",
-        value: data.address.split(",")[data.address.split(",").length-1],
+        value: data.address.split(",")[data.address.split(",").length - 1],
         icon: "fas fa-map-marker-alt",
       });
       this.profileDetails.push({
@@ -266,28 +372,28 @@ const summmary_view = Vue.component("summmary_view", {
         value: data.gender,
         icon: "fas fa-venus-mars",
       });
-      let servdata = await axios.get("/api/srvcreq",{
-        headers:{
+      let servdata = await axios.get("/api/srvcreq", {
+        headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
-        }
+        },
       });
       servdata = JSON.parse(servdata.data)["message"];
       this.overviewStats[0].value = servdata.length;
       let count_rejected = 0;
       let count_complete = 0;
-      for(let i=0;i<servdata.length;i++){
-        if(servdata[i].status=="Rejected")count_rejected+=1;
-        else if(servdata[i].status=="Completed")count_complete+=1;
+      for (let i = 0; i < servdata.length; i++) {
+        if (servdata[i].status == "Rejected") count_rejected += 1;
+        else if (servdata[i].status == "Completed") count_complete += 1;
         this.activityLog.push({
           service: servdata[i].service_name,
           date: `${servdata[i].date_srvcreq} - ${servdata[i].date_cmpltreq}`,
           id: servdata[i].srvcreq_id,
           icon: "fas fa-home",
-        })
+        });
       }
       this.overviewStats[1].value = count_complete;
       this.overviewStats[2].value = count_rejected;
-    }
+    },
   },
   mounted() {
     this.initStats();
@@ -295,6 +401,5 @@ const summmary_view = Vue.component("summmary_view", {
     this.initLineChart();
   },
   components: { footerman, navbar },
-}
-);
+});
 export default summmary_view;

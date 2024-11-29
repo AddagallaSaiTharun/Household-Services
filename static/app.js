@@ -18,8 +18,6 @@ const routes = [
   { path: "/add_service", component: add_service },
   { path: "/service/:id", component: service },
   { path: "/register_pro", component: register_pro },
-
-
   { path: "/", component: customers_view },
   { path: "/search", component: search_view },
   { path: "/summary", component: summary_view },
