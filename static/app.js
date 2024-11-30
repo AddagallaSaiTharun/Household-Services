@@ -11,6 +11,8 @@ import Admin_view from "./views/admin_view.js";
 import cart from "./components/cart.js";
 import order_view from "./views/orders_view.js";
 import rating_form from "./components/professional/rating_form.js";
+import pro_search from "./views/pro_search.js";
+
 
 const routes = [
   { path: "/login", component: Login },
@@ -24,7 +26,8 @@ const routes = [
   { path: "/professional", component: Pro_view },
   { path: "/admin", component: Admin_view},
   { path: "/cart", component: cart},
-  { path:"/orders", component: order_view}
+  { path:"/orders", component: order_view},
+  { path:"/searchorders", component: pro_search}
 ];
 
 const router = new VueRouter({

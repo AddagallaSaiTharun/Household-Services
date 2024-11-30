@@ -2,7 +2,7 @@ import navbar from "../components/navbar.js";
 import footer_comp from "../components/footer.js";
 import search_hero from "../components/search_hero.js";
 import search_bar from "../components/search-bar.js";
-
+import noti from "../components/notification.js";
 const search_view = Vue.component("search_view", {
   template: `
     <div id="search">
@@ -87,6 +87,7 @@ const search_view = Vue.component("search_view", {
           </div>
         </div>
       </div>
+      <noti></noti>
     </div>
   `,
   data() {
@@ -159,7 +160,7 @@ const search_view = Vue.component("search_view", {
       this.availableCategories = response.data["categories"];
     });
   },
-  components: { navbar,footer_comp,search_hero,search_bar},
+  components: { navbar,footer_comp,search_hero,search_bar, noti},
 });
 
 export default search_view;
