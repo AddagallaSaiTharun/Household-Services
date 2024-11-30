@@ -2,34 +2,30 @@ const noti = Vue.component("noti", {
   name:"noti",
   template: `
     <div
-          v-if="notification"
-          :class="['notification', { show: isVisible }]"
-          style="
-            position: fixed;
-            height: max-content;
-            top: 20px;
-            right: 20px;
-            background-color: #fffae6;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            font-size: 14px;
-            color: #333;
-          "
-        >
-          <div
-            class="notification-bell"
-            style="display: inline; margin-right: 8px"
-          >
-            <i class="fas fa-bell" style="color: #ff9800"></i>
-          </div>
-          {{ notification }}
-          <a
-            href="/"
-            style="color: #007bff; text-decoration: none; margin-left: 5px"
-            >view</a
-          >
-        </div>
+      v-if="notification"
+      :class="['notification', { show: isVisible }]"
+      style="
+        position: fixed;
+        height: max-content;
+        top: 20px;
+        right: 20px;
+        background-color: #fffae6;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        color: #333;
+      "
+    >
+      <div
+        class="notification-bell"
+        style="display: inline; margin-right: 8px"
+      >
+        <i class="fas fa-bell" style="color: #ff9800"></i>
+      </div>
+      {{ notification }}
+    </div>
+
   `,
   data() {
     return {
@@ -49,16 +45,7 @@ const noti = Vue.component("noti", {
     },
   },
   methods: {
-    async checkAdminStatus() {
-      try {
-        const response = await axios.get("/api/isadmin", {
-          headers: { Authorization: `Bearer ${this.token}` },
-        });
-        this.isAdmin = response.data;
-      } catch (error) {
-        console.error("Failed to check admin status:", error);
-      }
-    },
+    
     setupEventSource() {
       const source = new EventSource("http://127.0.0.1:5000/events");
 
@@ -85,7 +72,6 @@ const noti = Vue.component("noti", {
   },
   async created() {
     this.setupEventSource();
-    
   },
   beforeDestroy() {
     clearTimeout(this.hideTimeout);

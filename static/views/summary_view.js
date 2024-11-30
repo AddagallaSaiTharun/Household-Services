@@ -1,5 +1,7 @@
 import footerman from "../components/footer.js";
 import navbar from "../components/navbar.js";
+import noti from "../components/notification.js";
+
 const summmary_view = Vue.component("summmary_view", {
   template: `
     <div id="summary">
@@ -119,6 +121,7 @@ const summmary_view = Vue.component("summmary_view", {
         </div>
       </div>
     </section>
+    <noti></noti>
     <footerman></footerman>
     </div>
     
@@ -400,6 +403,6 @@ const summmary_view = Vue.component("summmary_view", {
     this.initBarChart();
     this.initLineChart();
   },
-  components: { footerman, navbar },
+  components: { footerman, navbar, noti },
 });
 export default summmary_view;
