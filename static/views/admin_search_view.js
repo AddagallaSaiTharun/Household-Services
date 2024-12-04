@@ -15,27 +15,93 @@ const adminSearch = Vue.component("adminSearch", {
         <div class="col-md-3">
           <div class="filter-section">
             <h5 class="filter-title text-center">Filters</h5>
+            <p class="filter-label">Status:</p>
             <div class="mb-3">
-              <label for="startDate" class="form-label">Completion Date (From):</label>
-              <input type="date" id="startDate" class="form-control" v-model="filters.startDate" />
+            <div class="form-check">
+              <label class="form-check-label" for="pending-checkbox">Pending</label>
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                value="pending" 
+                id="pending-checkbox" 
+                v-model="filters['Service Requests'].selectedStatus"
+                @change="applyFilters"
+              >
+              </div>
+              <div class="form-check">
+                <label class="form-check-label" for="rejected-checkbox">Rejected</label>
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  value="rejected" 
+                  id="rejected-checkbox" 
+                  v-model="filters['Service Requests'].selectedStatus"
+                  @change="applyFilters"
+                >
+              </div>
+              <div class="form-check">
+                <label class="form-check-label" for="accepted-checkbox">Accepted</label>
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  value="accepted" 
+                  id="accepted-checkbox" 
+                  v-model="filters['Service Requests'].selectedStatus"
+                  @change="applyFilters"
+                >
+              </div>
+              <div class="form-check">
+                <label class="form-check-label" for="completed-checkbox">Completed</label>
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  value="completed" 
+                  id="completed-checkbox" 
+                  v-model="filters['Service Requests'].selectedStatus"
+                  @change="applyFilters"
+                >
+              </div>
+          </div>
+            <div class="mb-3">
+              <p for="startDate" class="filter-label">Completion Date (From):</p>
+              <input type="date" id="startDate" class="form-control" v-model="filters['Service Requests'].startDate" />
             </div>
             <div class="mb-3">
-              <label for="endDate" class="form-label">Completion Date (To):</label>
-              <input type="date" id="endDate" class="form-control" v-model="filters.endDate" />
+              <p for="endDate" class="filter-label">Completion Date (To):</p>
+              <input type="date" id="endDate" class="form-control" v-model="filters['Service Requests'].endDate" />
             </div>
-            <div class="mb-3">
-              <label for="minCustRating" class="form-label">Minimum Customer Rating:</label>
-              <input type="number" id="minCustRating" class="form-control" v-model.number="filters.minCustRating" min="1" max="5" />
-            </div>
-            <div class="mb-3">
-              <label for="minProfRating" class="form-label">Minimum Professional Rating:</label>
-              <input type="number" id="minProfRating" class="form-control" v-model.number="filters.minProfRating" min="1" max="5" />
-            </div>
+            <div class="mb-4">
+                <p class="filter-label">Minimum Customer Rating:</p>
+                <input
+                  type="range"
+                  class="price-slider"
+                  v-model="filters['Service Requests'].minCustRating"
+                  min="0"
+                  max="5"
+                  step="0.5"
+                  @change="applyFilters"
+                />
+                <p>Minimum Customer Rating: {{ filters['Service Requests'].minCustRating }} ⭐</p>
+              </div>
+            <div class="mb-4">
+                <p class="filter-label">Minimum Professional Rating:</p>
+                <input
+                  type="range"
+                  class="price-slider"
+                  v-model="filters['Service Requests'].minProfRating"
+                  min="0"
+                  max="5"
+                  step="0.5"
+                  @change="applyFilters"
+                />
+                <p>Minimum Professional Rating: {{ filters['Service Requests'].minProfRating }} ⭐</p>
+              </div>
           </div>
         </div>
         <div class="col-md-9">
           <p v-if="isLoading">Loading service requests...</p>
           <div v-else>
+          <p>{{ filteredRequests.length }} results found</p>
             <div
               v-for="request in paginatedRequests"
               :key="request.srvcreq_id"
@@ -65,12 +131,16 @@ const adminSearch = Vue.component("adminSearch", {
                           <strong>User Phone:</strong> {{ request.phone }}
                         </p>
                         <p class="text-primary mb-1">
-                          <strong>Service Cost:</strong> ₹{{ request.cost }}
+                          <strong>Service Area:</strong> {{ request.address}}
                         </p>
-                        <h6 class="text-secondary">Professional Rating: {{ request.prof_rating }} ⭐</h6>
+                        <h6 class="text-secondary">Professional Rating: {{ request.prof_rating || 0 }} ⭐</h6>
+                        <h6 class="text-secondary">Customer Rating: {{ request.cust_rating || 0 }} ⭐</h6>
                       </div>
                       <!-- Service Details -->
                       <div class="col-md-7">
+                      <p class="text-primary mb-1">
+                        <strong>Service Name:</strong> {{ request.service_name }}
+                      </p>
                         <p class="text-primary mb-1">
                           <strong>Request Date:</strong> {{ request.date_srvcreq }}
                         </p>
@@ -78,9 +148,11 @@ const adminSearch = Vue.component("adminSearch", {
                           <strong>Completion Date:</strong> {{ request.date_cmpltreq }}
                         </p>
                         <p class="text-primary mb-1">
-                          <strong>Service Area:</strong> {{ request.address }}
+                          <strong>Service Cost:</strong> ₹{{ request.cost }}
                         </p>
-                        <h6 class="text-secondary">Customer Rating: {{ request.cust_rating }} ⭐</h6>
+                        <p class="text-primary mb-1">
+                          <strong>Status:</strong> {{ request.srvc_status }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -128,18 +200,75 @@ const adminSearch = Vue.component("adminSearch", {
     </div>
     <div class="container my-4" v-if="option === 'Users'">
       <div class="row justify-content-center">
+        <div class="col-md-3">
+        <div class="filter-section">
+          <h5 class="filter-title text-center">Filters</h5>
+          <p class="filter-label">Role:</p>
+          <div class="mb-3">
+            <div class="form-check">
+            <label class="form-check-label" for="user-checkbox">User</label>
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                value="user" 
+                id="user-checkbox" 
+                v-model="filters['Users'].selectedRoles"
+                @change="applyFilters"
+              >
+
+              </div>
+              <div class="form-check">
+              <label class="form-check-label" for="professional-checkbox">Professional</label>
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                value="professional" 
+                id="professional-checkbox" 
+                v-model="filters['Users'].selectedRoles"
+                @change="applyFilters"
+              >
+              </div>
+              <div class="form-check">
+              <label class="form-check-label" for="admin-checkbox">Admin</label>
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                value="admin" 
+                id="admin-checkbox" 
+                v-model="filters['Users'].selectedRoles"
+                @change="applyFilters"
+              >
+              </div>
+          </div>
+        <!-- Minimum Rating Filter -->
+          <div class="mb-4">
+                <p class="filter-label">Min Average Rating:</p>
+                <input
+                  type="range"
+                  class="price-slider"
+                  v-model="filters['Users'].minRating"
+                  min="0"
+                  max="5"
+                  step="0.5"
+                  @change="applyFilters"
+                />
+                <p>Average Rating: {{ filters['Users'].minRating }} ⭐</p>
+              </div>
+      </div>
+    </div>
         <div class="col-md-9">
           <p v-if="isLoading">Loading service requests...</p>
           <div v-else>
+          <p>{{ filteredRequests.length }} results found</p>
             <div
               v-for="request in paginatedRequests"
-              :key="request.srvcreq_id"
+              :key="request.user_id"
               class="card mb-3"
               style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;"
             >
               <div class="row g-0">
                 <!-- Image Section -->
-                <div class="col-md-3 d-flex align-items-center justify-content-center" style="background-color: #f8f9fa;">
+                <div class="col-md-2 d-flex align-items-center justify-content-center" style="background-color: #f8f9fa;">
                   <img
                     :src="request.user_image_url || 'static/images/profile.jpeg'"
                     alt="User Image"
@@ -157,27 +286,59 @@ const adminSearch = Vue.component("adminSearch", {
                           <strong>User Name:</strong> {{ request.first_name }} {{ request.last_name }}
                         </p>
                         <p class="text-primary mb-1">
+                          <strong>Email:</strong> {{ request.email }}
+                        </p>
+                        <p class="text-primary mb-1">
                           <strong>User Phone:</strong> {{ request.phone }}
                         </p>
                         <p class="text-primary mb-1">
-                          <strong>Service Cost:</strong> ₹{{ request.cost }}
+                        <strong>Service Area:</strong> {{ request.address }}
                         </p>
-                        <h6 class="text-secondary">Professional Rating: {{ request.prof_rating }} ⭐</h6>
+                        </div>
+                        <!-- Service Details -->
+                        <div class="col-md-5">
+                        <p class="text-primary mb-1">
+                        <strong>Average Rating:</strong> {{ request.avg_rating }} ⭐
+                        </p>
+                        <p class="text-primary mb-1">
+                          <strong>Role:</strong> {{ request.role }}
+                        </p>
                       </div>
-                      <!-- Service Details -->
-                      <div class="col-md-7">
-                        <p class="text-primary mb-1">
-                          <strong>Request Date:</strong> {{ request.date_srvcreq }}
-                        </p>
-                        <p class="text-primary mb-1">
-                          <strong>Completion Date:</strong> {{ request.date_cmpltreq }}
-                        </p>
-                        <p class="text-primary mb-1">
-                          <strong>Service Area:</strong> {{ request.address }}
-                        </p>
-                        <h6 class="text-secondary">Customer Rating: {{ request.cust_rating }} ⭐</h6>
+                      <div class= "col-md-2 d-flex align-items-center justify-content-center">
+                        <button 
+                          class="btn btn-danger" 
+                          data-bs-toggle="modal" 
+                          data-bs-target="#deleteModal" 
+                          @click="DeleteUser(request.user_id)">
+                        Block
+                      </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div
+              class="modal fade"
+              id="deleteModal"
+              tabindex="-1"
+              aria-labelledby="deleteModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to block this user <b>{{ selectedUser }}</b>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">Delete</button>
                   </div>
                 </div>
               </div>
@@ -227,53 +388,80 @@ const adminSearch = Vue.component("adminSearch", {
   data() {
     return {
       token: localStorage.getItem("token"),
-      optionResult:{
-          'Service Requests': [],
-          'Users': [],
-      },
       requests: [],
+      selectedUser: "",
       searchQuery: "",
       currentPage: 1,
       requestsPerPage: 10,
       isLoading: true,
       option: 'Service Requests',  
       filters: {
-        startDate: "",
-        endDate: "",
-        minCustRating: 0,
-        minProfRating: 0,
+        'Service Requests':{
+          startDate: "",
+          endDate: "",
+          minCustRating: 0,
+          minProfRating: 0,
+          selectedStatus: [],
+        },
+        'Users':{
+          selectedRoles: [],
+          minRating: 0,
+        },
+      },
+      optionResult:{
+          'Service Requests': [],
+          'Users': []
       }
     };
   },
   computed: {
     filteredRequests() {
       const query = this.searchQuery.toLowerCase();
-      return this.requests.filter((request) => {
-        const matchesQuery =
-          request.first_name?.toLowerCase().includes(query) ||
-          request.last_name?.toLowerCase().includes(query) ||
-          request.phone?.toString().includes(query) ||
-          request.srvc_status?.toLowerCase().includes(query) ||
-          request.srvcreq_id?.toString().includes(query) ||
-          request.email?.toLowerCase().includes(query);
-
-        const matchesDate =
-          (!this.filters.startDate ||
-            new Date(request.date_cmpltreq) >= new Date(this.filters.startDate)) &&
-          (!this.filters.endDate ||
-            new Date(request.date_cmpltreq) <= new Date(this.filters.endDate));
-
-        const matchesCustRating =
-          !this.filters.minCustRating ||
-          request.cust_rating >= this.filters.minCustRating;
-
-        const matchesProfRating =
-          !this.filters.minProfRating ||
-          request.prof_rating >= this.filters.minProfRating;
-
-        return matchesQuery && matchesDate && matchesCustRating && matchesProfRating;
+    
+      if (this.option === 'Service Requests') {
+        return this.requests.filter(request => {
+          const matchesQuery = request.first_name?.toLowerCase().includes(query) ||
+                               request.last_name?.toLowerCase().includes(query) ||
+                               request.phone?.toString().includes(query) ||
+                               request.srvc_status?.toLowerCase().includes(query) ||
+                               request.srvcreq_id?.toString().includes(query) ||
+                               request.email?.toLowerCase().includes(query);
+    
+          const matchesDate = (!this.filters['Service Requests'].startDate ||
+                               new Date(request.date_cmpltreq) >= new Date(this.filters['Service Requests'].startDate)) &&
+                              (!this.filters['Service Requests'].endDate ||
+                               new Date(request.date_cmpltreq) <= new Date(this.filters['Service Requests'].endDate));
+    
+          const matchesCustRating = !this.filters['Service Requests'].minCustRating ||
+                                    request.cust_rating >= this.filters['Service Requests'].minCustRating;
+    
+          const matchesProfRating = !this.filters['Service Requests'].minProfRating ||
+                                    request.prof_rating >= this.filters['Service Requests'].minProfRating;
+              
+          const matchesStatus = this.filters['Service Requests'].selectedStatus.length === 0 ||
+                                  this.filters['Service Requests'].selectedStatus.includes(request.srvc_status);
+          return matchesQuery && matchesDate && matchesCustRating && matchesProfRating && matchesStatus;
+        });
+      }
+    
+      // Add checks for Users' filters
+      const userFilters = this.filters.Users || { selectedRoles: [], minRating: 0 };
+    
+      return this.requests.filter(request => {
+        const matchesQuery = request.first_name?.toLowerCase().includes(query) ||
+                             request.last_name?.toLowerCase().includes(query) ||
+                             request.phone?.toString().includes(query) ||
+                             request.email?.toLowerCase().includes(query);
+    
+        const matchesRole = userFilters.selectedRoles.length === 0 ||
+                            userFilters.selectedRoles.includes(request.role);
+    
+        const matchesRating = request.avg_rating >= userFilters.minRating;
+    
+        return matchesQuery && matchesRole && matchesRating;
       });
     },
+     
     totalPages() {
       return Math.ceil(this.filteredRequests.length / this.requestsPerPage);
     },
@@ -284,6 +472,21 @@ const adminSearch = Vue.component("adminSearch", {
     },
   },
   methods: {
+    DeleteUser(user_id) { 
+      this.selectedUser = user_id;
+    },
+    async confirmDelete() {
+      console.log(`Deleting user with ID: ${this.selectedUser}`);
+      // Example API call logic
+      alert(`User with ID ${this.selectedUser} has been deleted.`);
+      const userResponse = await axios.get("/api/user", {
+        headers: {
+          Authorization: "Bearer " + this.token,
+        },
+      });
+      this.requests = JSON.parse(userResponse.data)['message'];
+      this.optionResult['Users'] = this.requests;
+    },
     async fetchServiceRequests() {
       try {
         this.isLoading = true;
@@ -297,13 +500,13 @@ const adminSearch = Vue.component("adminSearch", {
           },
         });
         this.requests = JSON.parse(response.data)['message'];
-        this.optionResult.requestsService = this.requests;
-        const userResponse = await axios.get("/api/users", {
+        this.optionResult['Service Requests'] = this.requests;
+        const userResponse = await axios.get("/api/user", {
           headers: {
             Authorization: "Bearer " + this.token,
           },
         });
-        this.optionResult.requestsUsers = JSON.parse(userResponse.data)['message'];
+        this.optionResult.Users = JSON.parse(userResponse.data)['message'];
       } catch (error) {
         console.error("Error fetching service requests:", error);
       } finally {
@@ -317,7 +520,8 @@ const adminSearch = Vue.component("adminSearch", {
     updateOption(option) {
       this.option = option;
       this.clearFilters();
-      this.requests = optionResult[option];
+      console.log(option);
+      this.requests = this.optionResult[option];
     },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
@@ -328,14 +532,22 @@ const adminSearch = Vue.component("adminSearch", {
       this.currentPage = 1;
     },
     clearFilters() {
-      this.filters = {
-        startDate: "",
-        endDate: "",
-        minCustRating: 0,
-        minProfRating: 0,
-      };
+      if (this.option === 'Service Requests') {
+        this.filters['Service Requests'] = {
+          startDate: "",
+          endDate: "",
+          minCustRating: 0,
+          minProfRating: 0,
+          selectedStatus: [],
+        };
+      } else if (this.option === 'Users') {
+        this.filters.Users = {
+          selectedRoles: [],
+          minRating: 0,
+        };
+      }
       this.currentPage = 1;
-    },
+    }    
   },
   async created() {
     await this.fetchServiceRequests();

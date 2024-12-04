@@ -2,11 +2,12 @@ from flask_restful import Resource
 from flask import request
 from application.utils.validation import preprocesjwt
 from application.data.database import db
-from application.data.models import Users, Professionals
+from application.data.models import Users, Professionals,ServiceRequests
 import json
 from flask_bcrypt import Bcrypt
 from flask import current_app as app
 from datetime import datetime
+from sqlalchemy.sql import func,case
 
 
 bcrypt = Bcrypt(app)
@@ -46,9 +47,31 @@ class UserAPI(Resource):
                 for column in user_col:
                     if column in data:
                         query = query.filter(getattr(Users, column) == data[column])
-            users = query.all()
-            return json.dumps({"message": [{'user_id': user.user_id, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, 'age': user.age, 'gender': user.gender, 'role': user.role, 'user_image_url': user.user_image_url, 'password': user.password, 'phone': user.phone, 'address': user.address, 'address_link': user.address_link, 'pincode': user.pincode} for user in users]})
-        
+            avg_rating_case = case(
+                (Users.role == 'user', ServiceRequests.cust_rating),
+                else_=ServiceRequests.prof_rating
+            )
+            results = query.outerjoin(Users.srvc_reqs).add_columns( func.avg(avg_rating_case).label('avg_rating')).group_by(Users.user_id).all()
+            users_data = [
+                {
+                    'user_id': user.user_id,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'age': user.age,
+                    'gender': user.gender,
+                    'role': user.role,
+                    'user_image_url': user.user_image_url,
+                    'password': user.password,
+                    'phone': user.phone,
+                    'address': user.address,
+                    'address_link': user.address_link,
+                    'pincode': user.pincode,
+                    'avg_rating': avg_rating or 0 
+                }
+                for user, avg_rating in results
+                        ]
+            return json.dumps({"message": users_data})
         return json.dumps({'error': 'Unauthorized access'}), 401
 
     def put(self):

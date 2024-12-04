@@ -1,6 +1,6 @@
 import Navbar from "../components/navbar.js";
 import Notification from "../components/notification.js";
-
+import footerman from "../components/footer.js";
 const AdminHome = Vue.component("admin-home", {
   template: `
     <div>
@@ -24,6 +24,7 @@ const AdminHome = Vue.component("admin-home", {
             </div>
           </div>
       </div>
+      <footerman/>
     </div>
   `,
   data() {
@@ -69,7 +70,7 @@ const AdminHome = Vue.component("admin-home", {
   async created() {
     await this.loadProfessionals();
   },
-  components: { Navbar, Notification },
+  components: { Navbar, Notification, footerman },
 });
 
 export default AdminHome;

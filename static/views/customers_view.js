@@ -30,13 +30,14 @@ const CustomersView = Vue.component("CustomersView", {
       const categoryResponse = await axios.get("/unique_categories");
       const categories = categoryResponse.data["categories"];
       
-      for (const category of categories) {
+      for (let [index,category] of categories.entries()) {
         try {
           const serviceResponse = await axios.get("/api/service", {
             params: { category },
           });
           const serviceContent = JSON.parse(serviceResponse.data)["content"];
           this.categories.push(serviceContent);
+          if(index>=4)break;
         } catch (error) {
           console.error(`Error fetching services for category: ${category}`, error);
         }

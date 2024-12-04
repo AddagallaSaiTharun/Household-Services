@@ -9,7 +9,7 @@ const navbar = Vue.component("navbar", {
     <li v-if="isPro"><RouterLink to="/professional" :class="{active: $route.path === '/professional'}">Home</RouterLink></li>
     <li v-if="isPro"><RouterLink to="/searchorders" :class="{active: $route.path === '/searchorders'}">Search</RouterLink></li>
     <li v-if="isAdmin"><RouterLink to="/admin" :class="{active: $route.path === '/admin'}">Home</RouterLink></li>
-    <li v-if="isAdmin"><RouterLink to="/adminsearch" :class="{active: $route.path === '/searchorders'}">Search</RouterLink></li>
+    <li v-if="isAdmin"><RouterLink to="/adminsearch" :class="{active: $route.path === '/adminsearch'}">Search</RouterLink></li>
     <li v-if="isAdmin"><RouterLink to="/add_service" :class="{active: $route.path === '/add_service'}">Add Service</RouterLink></li>
     <li v-if="!isPro && !isAdmin"><RouterLink to="/" :class="{active: $route.path === '/'}">Home</RouterLink></li>
     <li v-if="!isPro && !isAdmin"><RouterLink to="/search" :class="{active: $route.path === '/search' }">Search</RouterLink></li>

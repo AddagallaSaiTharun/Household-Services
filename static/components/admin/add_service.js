@@ -16,6 +16,11 @@ const add_service = Vue.component("add-service", {
           </div>
           
           <div style="display: flex; flex-direction: column;">
+            <label for="Category" style="font-size: 16px; color: #555; margin-bottom: 5px;">Category:</label>
+            <input type="text" id="Category" v-model="service.category" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
+          </div>
+
+          <div style="display: flex; flex-direction: column;">
             <label for="time_req" style="font-size: 16px; color: #555; margin-bottom: 5px;">Time Required (in minutes):</label>
             <input type="number" id="time_req" v-model="service.time_req" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
           </div>
@@ -51,6 +56,7 @@ const add_service = Vue.component("add-service", {
       token: localStorage.getItem("token"),
       service: {
         service_name: "",
+        category: "",
         time_req: "",
         service_base_price: "",
         service_dscp: "",
