@@ -4,7 +4,7 @@ from flask_restful import Resource
 from flask import request
 from application.utils.validation import preprocesjwt
 from application.data.database import db
-from application.data.models import ServiceRequests, Users
+from application.data.models import ServiceRequests, Users,Services
 from application.jobs.sse import send_notification
 
 from datetime import date
@@ -52,6 +52,7 @@ class ServiceRequestAPI(Resource):
         }
 
         for srvcreq in srvcreqs:
+            ser = Services.query.filter_by(service_id=srvcreq.srvc_id).first()
             srvcreq_data = {
                 'srvcreq_id': srvcreq.srvcreq_id, 
                 'srvc_id': srvcreq.srvc_id, 
@@ -64,9 +65,10 @@ class ServiceRequestAPI(Resource):
                 'cust_rating': srvcreq.cust_rating, 
                 'prof_rating': srvcreq.prof_rating, 
                 'cust_review': srvcreq.cust_review, 
-                'prof_review': srvcreq.prof_review
+                'prof_review': srvcreq.prof_review,
+                'cost':ser.service_base_price,
+                'service_name':ser.service_name
             }
-
             if role == "professional":
                 srvcreq_data.update({
                     "email": srvcreq.usr.email,
@@ -80,11 +82,12 @@ class ServiceRequestAPI(Resource):
                 })
             elif role == "user":
                 srvcreq_data.update({
-                    'prof_exp': srvcreq.prof_service.prof_exp,
-                    'prof_dscp': srvcreq.prof_service.prof_dscp,
-                    'prof_srvcid': srvcreq.prof_service.prof_srvcid,
-                    'prof_ver': srvcreq.prof_service.prof_ver,
-                    'prof_join_date': srvcreq.prof_service.prof_join_date,
+                    'prof_exp': srvcreq.srvc_professional.prof_exp,
+                    'prof_dscp': srvcreq.srvc_professional.prof_dscp,
+                    'prof_srvcid': srvcreq.srvc_professional.prof_srvcid,
+                    'prof_ver': srvcreq.srvc_professional.prof_ver,
+                    'prof_join_date': srvcreq.srvc_professional.prof_join_date.strftime('%Y-%m-%d'),
+                    'prof_name': srvcreq.srvc_professional.usr.first_name + ' ' + srvcreq.srvc_professional.usr.last_name,
                 })
             elif role == "admin":
                 srvcreq_data.update({
@@ -96,15 +99,14 @@ class ServiceRequestAPI(Resource):
                     "address_link": srvcreq.usr.address_link,
                     "pincode": srvcreq.usr.pincode,
                     "user_image_url": srvcreq.usr.user_image_url,
-                    "prof_exp": srvcreq.prof_service.prof_exp,
-                    "prof_dscp": srvcreq.prof_service.prof_dscp,
-                    "prof_srvcid": srvcreq.prof_service.prof_srvcid,
-                    "prof_ver": srvcreq.prof_service.prof_ver,
-                    "prof_join_date": srvcreq.prof_service.prof_join_date.strftime('%Y-%m-%d'),
+                    "prof_exp": srvcreq.srvc_professional.prof_exp,
+                    "prof_dscp": srvcreq.srvc_professional.prof_dscp,
+                    "prof_srvcid": srvcreq.srvc_professional.prof_srvcid,
+                    "prof_ver": srvcreq.srvc_professional.prof_ver,
+                    "prof_join_date": srvcreq.srvc_professional.prof_join_date.strftime('%Y-%m-%d'),
                 })
 
             response["message"].append(srvcreq_data)
-
         return json.dumps(response)
 
     def post(self):
@@ -123,9 +125,10 @@ class ServiceRequestAPI(Resource):
         user_id, role, _, error = preprocesjwt(request)
 
         if error or role != "user":
+            print(role)
             return json.dumps({'error': 'Unauthorized access'}), 401
 
-        data = request.form
+        data = request.get_json()
         
         required_fields = ["srvc_id", "prof_id", "remarks"]
         if not all(field in data for field in required_fields):
@@ -178,14 +181,13 @@ class ServiceRequestAPI(Resource):
 
         user_email = Users.query.filter_by(user_id=user).first().email
         pro_email = Users.query.filter_by(user_id=pro_id).first().email
+        srvcreq = None
         if role == "user":
             srvcreq = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"], customer_id=user_id).first()
         elif role == "professional":
             srvcreq = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"], prof_id=user_id).first()
         elif role == "admin":
             srvcreq = ServiceRequests.query.filter_by(srvcreq_id=data["srvcreq_id"]).first()
-        else:
-            return json.dumps({'error': 'Unauthorized access'}), 401
         if not srvcreq:
             return json.dumps({"error": f"{data['srvcreq_id']} not found "}), 400
         if role in ("user", "admin"):
@@ -193,11 +195,6 @@ class ServiceRequestAPI(Resource):
                 srvcreq.prof_rating = data["rating"]
             if "review" in data:
                 srvcreq.prof_review = data["review"]
-
-            if data['srvc_status'] == "canceled" and srvcreq.srvc_status == "pending":
-                srvcreq.srvc_status = data['srvc_status']
-                data = {"msg" : f"You have cancelled your request!! Retry again!", "email" : user_email}
-                send_notification(data)
             
 
         if role in ("professional", "admin"):

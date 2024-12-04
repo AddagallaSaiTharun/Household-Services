@@ -1,14 +1,14 @@
 const category_component = Vue.component("category", {
-    props: ["category"],
+    props: ["category","unique"],
     template: `
       <div class="container-fluid my-5 shadow">
-        <div :id="category[0]?.category + 'Carousel'" class="carousel slide mx-5" data-bs-ride="carousel">
+        <div :id="unique + 'Carousel'" class="carousel slide mx-5" data-bs-ride="carousel">
           <div class="carousel-indicators" style="z-index: 10">
             <button 
               v-for="(chunk, index) in serviceChunks" 
               :key="'indicator-' + index" 
               type="button" 
-              :data-bs-target="'#' + category[0]?.category + 'Carousel'" 
+              :data-bs-target="'#' + unique + 'Carousel'" 
               :data-bs-slide-to="index" 
               :class="{ active: index === 0 }"
               :aria-label="'Slide ' + (index + 1)">
@@ -28,12 +28,12 @@ const category_component = Vue.component("category", {
                         <div class="card-body">
                           <h5 class="card-title fw-bold">{{ service.service_name }}</h5>
                           <p class="card-text fst-italic">{{ service.service_dscp }}</p>
-                          <button class="btn btn-custom-outline p-2">Book Now</button>
+                          <RouterLink :to="'/service/' + service.service_id" class="btn btn-custom-outline p-2">Book Now</RouterLink>
                         </div>
                       </div>
                       <div class="col-3 d-flex align-items-center p-3">
                         <img 
-                          :src="'data:image/jpg;base64,'+service.service_image || 'static/images/default_service.jpg'" 
+                          :src="service.service_image ? 'data:image/jpg;base64,' + service.service_image : '/static/images/home/service2.jpg'" 
                           class="img-fluid rounded-start" 
                           alt="Service Image">
                       </div>
@@ -65,7 +65,9 @@ const category_component = Vue.component("category", {
       },
     },
     created() {
-      
+      $('.carousel').carousel({
+        interval: 2000
+      });
     },
     methods: {},
   });

@@ -1,3 +1,5 @@
+import otp_form from "./otp_form.js";
+
 const current_order = Vue.component("current_order", {
   props: ["current_order", "engaged"],
 
@@ -185,9 +187,6 @@ const current_order = Vue.component("current_order", {
       showratingForm: false
     };
   },
-  created() {
-    console.log(this.current_order)
-  },
   
   methods: {
     closeForm() {
@@ -212,6 +211,7 @@ const current_order = Vue.component("current_order", {
     },
     
   },
+  components: { otp_form },
 });
 
 export default current_order;

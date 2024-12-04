@@ -1,7 +1,7 @@
 const footerman = Vue.component("foo", {
   props: [],
   template: `
-          <footer class="footer text-center">
+    <footer class="footer text-center mt-5">
         <div class="container">
             <div class="fs-1 fw-bold" style="justify-content:flex-start ;">
                 <img src="static/images/home/Image.jpg" alt="Logo" />

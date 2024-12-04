@@ -32,9 +32,6 @@ const pro_navbar = Vue.component("pro_navbar", {
       };
     },
     computed: {
-      isUserLoggedIn() {
-        return localStorage.getItem("user");
-      },
       user() {
         return localStorage.getItem("user");
       },

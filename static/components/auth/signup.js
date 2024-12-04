@@ -32,7 +32,7 @@ const Signup = Vue.component("SignupComponent", {
               >
               <input
                 type="text"
-                v-model="first_name"
+                v-model="profile.first_name"
                 name="first_name"
                 id="first_name"
                 required
@@ -46,13 +46,14 @@ const Signup = Vue.component("SignupComponent", {
             </div>
             <div style="flex: 1">
               <label for="last_name" style="color: #333; font-size: 14px"
-                >Last Name (optional):</label
+                >Last Name:</label
               >
               <input
                 type="text"
-                v-model="last_name"
+                v-model="profile.last_name"
                 name="last_name"
                 id="last_name"
+                required
                 style="
                   width: 100%;
                   padding: 8px;
@@ -62,12 +63,10 @@ const Signup = Vue.component("SignupComponent", {
               />
             </div>
             <div style="flex: 1">
-              <label for="email" style="color: #333; font-size: 14px"
-                >Email:</label
-              >
+              <label for="email" style="color: #333; font-size: 14px">Email:</label>
               <input
                 type="email"
-                v-model="email"
+                v-model="profile.email"
                 name="email"
                 id="email"
                 required
@@ -83,12 +82,10 @@ const Signup = Vue.component("SignupComponent", {
 
           <div style="display: flex; gap: 10px">
             <div style="flex: 1">
-              <label for="phone" style="color: #333; font-size: 14px"
-                >Phone:</label
-              >
+              <label for="phone" style="color: #333; font-size: 14px">Phone:</label>
               <input
                 type="tel"
-                v-model="phone"
+                v-model="profile.phone"
                 name="phone"
                 id="phone"
                 pattern="[0-9]{10}"
@@ -107,7 +104,7 @@ const Signup = Vue.component("SignupComponent", {
               >
               <input
                 type="url"
-                v-model="address_link"
+                v-model="profile.address_link"
                 name="address_link"
                 id="address_link"
                 style="
@@ -124,7 +121,7 @@ const Signup = Vue.component("SignupComponent", {
               >
               <input
                 type="url"
-                v-model="user_image_url"
+                v-model="profile.user_image_url"
                 name="user_image_url"
                 id="user_image_url"
                 style="
@@ -137,11 +134,9 @@ const Signup = Vue.component("SignupComponent", {
             </div>
           </div>
 
-          <label for="address" style="color: #333; font-size: 14px"
-            >Address:</label
-          >
+          <label for="address" style="color: #333; font-size: 14px">Address:</label>
           <textarea
-            v-model="address"
+            v-model="profile.address"
             name="address"
             id="address"
             style="padding: 8px; border: 1px solid #ddd; border-radius: 5px"
@@ -154,9 +149,10 @@ const Signup = Vue.component("SignupComponent", {
               >
               <input
                 type="number"
-                v-model="pincode"
+                v-model="profile.pincode"
                 name="pincode"
                 id="pincode"
+                required
                 style="
                   padding: 8px;
                   border: 1px solid #ddd;
@@ -166,14 +162,13 @@ const Signup = Vue.component("SignupComponent", {
               />
             </div>
             <div style="flex: 1">
-              <label for="age" style="color: #333; font-size: 14px"
-                >Age (optional):</label
-              >
+              <label for="age" style="color: #333; font-size: 14px">Age:</label>
               <input
                 type="number"
-                v-model="age"
+                v-model="profile.age"
                 name="age"
                 id="age"
+                required
                 style="
                   width: 100%;
                   padding: 8px;
@@ -184,11 +179,10 @@ const Signup = Vue.component("SignupComponent", {
             </div>
             <div style="flex: 1">
               <label for="gender" style="color: #333; font-size: 14px"
-                >Gender (optional):</label
+                >Gender:</label
               >
-              <input
-                type="text"
-                v-model="gender"
+              <select
+                v-model="profile.gender"
                 name="gender"
                 id="gender"
                 style="
@@ -197,7 +191,11 @@ const Signup = Vue.component("SignupComponent", {
                   border: 1px solid #ddd;
                   border-radius: 5px;
                 "
-              />
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
             </div>
           </div>
 
@@ -206,7 +204,7 @@ const Signup = Vue.component("SignupComponent", {
           >
           <input
             type="password"
-            v-model="password"
+            v-model="profile.password"
             name="password"
             id="password"
             required
@@ -218,7 +216,7 @@ const Signup = Vue.component("SignupComponent", {
           >
           <input
             type="password"
-            v-model="confirm_password"
+            v-model="profile.confirm_password"
             name="confirm_password"
             id="confirm_password"
             required
@@ -251,57 +249,43 @@ const Signup = Vue.component("SignupComponent", {
         </p>
 
         <div style="text-align: center">
-          <a
-            href="/#/login"
+          <RouterLink
+            to="/login"
             style="color: #4caf50; font-size: 14px; text-decoration: none"
-            >Already have an account? Login here</a
+            >Already have an account? Login here</RouterLink
           >
         </div>
       </div>
     </div>
-
-  `,
+`,
   data() {
     return {
-      email: "",
-      first_name: "",
-      last_name: "",
-      age: "",
-      gender: "",
-      user_image_url: "",
-      password: "",
-      confirm_password: "",
-      phone: "",
-      address: "",
-      address_link: "",
-      pincode: "",
+      profile: {
+        email: "",
+        first_name: "",
+        last_name: "",
+        age: "",
+        gender: "",
+        user_image_url: "",
+        password: "",
+        confirm_password: "",
+        phone: "",
+        address: "",
+        address_link: "",
+        pincode: "",
+        role: "user",
+      },
     };
   },
   methods: {
     async submitSignup() {
       try {
-        const response = await axios.post("/api/user", {
-          email: this.email,
-          first_name: this.first_name,
-          last_name: this.last_name,
-          age: this.age,
-          gender: this.gender,
-          user_image_url: this.user_image_url,
-          password: this.password,
-          confirm_password: this.confirm_password,
-          phone: this.phone,
-          address: this.address,
-          address_link: this.address_link,
-          pincode: this.pincode,
-          role: "user",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await axios.post("/api/user", this.profile,
+        );
         if (response.status == 201) {
-          window.location.href = "/#/login";
+          this.$router.push("/login");
         } else {
-          alert("Signup failed: " + data.message);
+          alert("Signup failed: " + response.data.message);
         }
       } catch (error) {
         console.error("Error during signup:", error);

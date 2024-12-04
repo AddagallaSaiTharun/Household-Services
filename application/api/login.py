@@ -24,7 +24,7 @@ class UserLogin(Resource):
         password = data.get('password')
         user = Users.query.filter_by(email=data.get('email')).first()
         if not user:
-            return json.dumps({'message': 'No user Found'}), 401
+            return json.dumps({'error': 'No user Found'}), 401
         if not bcrypt.check_password_hash(user.password, password):
             return json.dumps({'error': 'Invalid password'}), 401
         token = jwt.encode({
@@ -34,7 +34,7 @@ class UserLogin(Resource):
             'name': user.first_name,
             'address': user.address,
             'address_link': user.address_link,
-            'exp': datetime.utcnow() + timedelta(minutes=30)
+            'exp': datetime.utcnow() + timedelta(minutes=120)
         }, app.config['SECRET_KEY'], 
         )
         if user.role == "professional":

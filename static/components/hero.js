@@ -17,7 +17,7 @@ const heroCarousel = Vue.component("heroCarousel", {
                     <p class="lead">
                         Expert repair and maintenance services at your doorstep.
                     </p>
-                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;">Get
+                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;" @click="navigateToAddService" >Get
                         Started</button>
                 </div>
             </div>
@@ -27,7 +27,7 @@ const heroCarousel = Vue.component("heroCarousel", {
                     <p class="lead">
                         From Fixes to Finishes – We’ve Got Your Home Covered!
                     </p>
-                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;">Explore
+                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;" @click="navigateToAddService" >Explore
                         Services</button>
                 </div>
             </div>
@@ -37,7 +37,7 @@ const heroCarousel = Vue.component("heroCarousel", {
                     <p class="lead">
                         Professional services to keep your home in top shape.
                     </p>
-                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;">Book Now</button>
+                    <button class="btn p-3" style="background-color: rgb(99, 106, 232); color: #fff;" @click="navigateToAddService" >Book Now</button>
                 </div>
             </div>
         </div>
@@ -53,7 +53,15 @@ const heroCarousel = Vue.component("heroCarousel", {
   },
   created() {noti},
 
-  methods: {},
+  methods: {
+    navigateToAddService() {
+        if(this.user === null)
+            this.$router.push("/login");
+        else
+            this.$router.push("/search");
+
+    },
+  },
 });
 
 export default heroCarousel;

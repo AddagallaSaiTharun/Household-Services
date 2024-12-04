@@ -30,7 +30,8 @@ class ServiceAPI(Resource):
             query = query.filter(*(getattr(Services, key) == value for key, value in filter_args.items()))
 
 
-        services = query.all()
+        services = query.order_by(Services.service_name.asc()).all()
+
         result = []
         for service in services:
             # Decode the base64 image
@@ -100,8 +101,6 @@ class ServiceAPI(Resource):
         _, role, _, error = preprocesjwt(request)
         if error or role != "admin":
             return json.dumps({'error': 'Unauthorized access'}), 401
-
-        file = request.files['service_image']
         data = request.form
         required_fields = ["service_name", "time_req", "service_base_price", "service_dscp"]
 
@@ -110,6 +109,7 @@ class ServiceAPI(Resource):
             return json.dumps({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
 
         image_data = None
+        file = request.files['service_image']
 
         if 'service_image' in request.files:
             img = Image.open(file)

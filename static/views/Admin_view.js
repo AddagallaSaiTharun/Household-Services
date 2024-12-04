@@ -1,98 +1,75 @@
-import navbar from "../components/navbar.js";
-import noti from "../components/notification.js";
+import Navbar from "../components/navbar.js";
+import Notification from "../components/notification.js";
 
-const admin_home = Vue.component("admin-home", {
+const AdminHome = Vue.component("admin-home", {
   template: `
     <div>
       <navbar />
       <noti></noti>
-      <h2>This is the admin page</h2>
-      <button class="btn btn-primary" @click="add_service">Add_Service</button>
-      <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-          <div class="col-md-4" v-for="(pro, index) in pros" :key="index">
-              <div v-if="pro.prof_ver == 0">
-                  <div class="card" style="width: 2.8in; margin: 10px;">
-                      <div class="card-body">
-                        <center>
-                          <img src="static/icons/profile_big.jpg" alt="">
-                          <h5 class="card-title">name : {{ pro['name'] }}</h5>
-                          <p class="card-text">Pro of : {{ pro['service_name'] }}</p>
-                          <p class="card-text">Pro for {{ pro['prof_exp'] }} years </p>
-                          <p class="card-text">description {{ pro['prof_dscp'] }}</p>
-                          <button class="btn btn-primary" @click="approve_pro(pro.prof_userid)">Approve Pro</button>
-                        </center>
-                      </div>
-                  </div>
+      <div
+        class = "row row-cols-4 row-cols-lg-5 g-5 m-5 "
+      >
+        <div class="col" v-for="([id,professional], index) in professionals" :key="index">
+            <div class="card">
+              <div class="card-body">
+                <center>
+                  <img src="static/icons/profile_big.jpg" alt="Profile Image" class="card-img-top">
+                  <h5 class="card-title">Name: {{ professional.username }}</h5>
+                  <p class="card-text">Service: {{ professional.service_name }}</p>
+                  <p class="card-text">Experience: {{ professional.prof_exp }} years</p>
+                  <p class="card-text">Description: {{ professional.prof_dscp }}</p>
+                  <button class="btn btn-primary" @click="approveProfessional(userId)">Approve Pro</button>
+                </center>
               </div>
+            </div>
           </div>
       </div>
-  </div>
-
-
-    `,
+    </div>
+  `,
   data() {
     return {
       token: localStorage.getItem("token"),
-      pros: [],
+      professionals: new Map(),
     };
   },
   methods: {
-    approve_pro(id) {
+    async approveProfessional(userId) {
       try {
-        const res = axios.put(
+        // Send the approval request to the server
+        await axios.put(
           "/api/professional",
-          {
-            prof_userid: id,
-            prof_ver: "1",
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + this.token,
-            },
-          }
+          { prof_userid: userId, prof_ver: "1" },
+          { headers: { Authorization: `Bearer ${this.token}` } }
         );
-        window.location.reload();
+
+        // Remove the professional from the map after approval
+        this.professionals.delete(userId);
       } catch (error) {
-        console.error(error);
+        console.error("Error approving professional:", error);
       }
     },
-    add_service() {
-      window.location.href = "/#/add_service";
+    async loadProfessionals() {
+      try {
+        const response = await axios.get("/api/professional", {
+          headers: { Authorization: `Bearer ${this.token}` },
+          params: { prof_ver: 0 }
+        });
+
+        // Populate the professionals map with the response data
+        const professionalsData = JSON.parse(response.data).message;
+        console.log(professionalsData);
+        this.professionals = new Map(
+          professionalsData.map(professional => [professional.prof_userid, professional])
+        );
+      } catch (error) {
+        console.error("Error loading professionals:", error);
+      }
     },
   },
   async created() {
-    const response = await axios.get("/api/professional", {
-      headers: {
-        Authorization: "Bearer " + this.token,
-      },
-    });
-    const pros = JSON.parse(response.data).message;
-    for (var pro in pros) {
-      const response2 = await axios.get("/api/service", {
-        params: {
-          service_id: pros[pro].prof_srvcid,
-        },
-        headers: {
-          Authorization: "Bearer " + this.token,
-        },
-      });
-      pros[pro]["service_name"] = JSON.parse(
-        response2.data
-      ).content[0].service_name;
-
-      const name = await axios.get("api/user", {
-        params: {
-          user_id: pros[pro].prof_userid,
-        },
-        headers: {
-          Authorization: "Bearer " + this.token,
-        },
-      });
-      pros[pro]["name"] = JSON.parse(name.data).message[0].first_name;
-      this.pros.push(pros[pro]);
-    }
+    await this.loadProfessionals();
   },
-  components: { navbar, noti },
+  components: { Navbar, Notification },
 });
 
-export default admin_home;
+export default AdminHome;

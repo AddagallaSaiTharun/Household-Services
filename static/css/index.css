@@ -912,3 +912,107 @@ body {
   -ms-overflow-style: none; /* Hides the scrollbar in Internet Explorer */
   scrollbar-width: none; /* Hides the scrollbar in Firefox */
 }
+
+/* General Styles for the Slider Container */
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.filter-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+/* Range Slider Styles */
+.price-slider {
+  -webkit-appearance: none; /* Removes default slider appearance */
+  width: 100%; /* Full width */
+  height: 8px; /* Track height */
+  background: #ced0f8; /* Light gray for the inactive track */
+  border-radius: 4px; /* Rounded corners */
+  outline: none; /* No outline on focus */
+  transition: background 0.3s ease;
+  position: relative;
+  margin: 0; /* Aligns the slider with the container */
+}
+
+/* Active Track Progress */
+.price-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #636ae8, #ced0f8); /* Gradient for the active track */
+  height: 8px; /* Track height */
+  border-radius: 4px; /* Rounded edges */
+}
+
+/* Slider Handle */
+.price-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Removes default handle appearance */
+  appearance: none;
+  width: 20px; /* Handle width */
+  height: 20px; /* Handle height */
+  background: #636ae8; /* Handle color */
+  border-radius: 50%; /* Rounded handle */
+  border: 2px solid #fff; /* Border for contrast */
+  cursor: pointer; /* Change cursor to pointer */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  margin-top: -6px; /* Center handle on the track */
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* Handle Hover Effect */
+.price-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2); /* Slightly enlarge handle */
+  background: #505bd1; /* Darker handle color */
+}
+
+/* For Firefox */
+.price-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #636ae8;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  cursor: pointer;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background 0.2s ease;
+  margin-top: -6px; /* Center handle on the track */
+}
+
+.price-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #505bd1;
+}
+
+.hero-section {
+  margin-top: 50px;
+  text-align: center;
+}
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #343a40;
+}
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  margin: 20px 0;
+}
+.hero-text {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+.btn-primary-custom {
+  background-color: #007bff;
+  border-color: #007bff;
+  font-size: 1rem;
+  padding: 10px 20px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-primary-custom:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}

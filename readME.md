@@ -120,7 +120,7 @@ The customer uses the platform to book services.
    - Install and start Redis.
    - Run Celery workers:
      ```
-     celery -A tasks worker --loglevel=info
+     celery -A main.celery worker --loglevel=info --pool=solo
      ```
 
 ### Configuration
